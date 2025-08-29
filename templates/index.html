@@ -29,7 +29,6 @@
 <body class="bg-gray-100 text-gray-800">
 
     <div class="flex h-screen">
-        <!-- Sidebar -->
         <aside class="w-64 bg-gray-800 text-white p-4 flex flex-col fixed h-full">
             <h1 class="text-2xl font-bold mb-6">City-Zen Tester</h1>
             <nav class="flex flex-col space-y-2">
@@ -52,17 +51,14 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="flex-1 ml-64 p-8 overflow-y-auto pb-48">
             <div id="loader" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                 <div class="loader"></div>
             </div>
 
-            <!-- Auth Section -->
             <section id="auth" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Authentication</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Registration -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-xl font-semibold mb-4">Register</h3>
                         <form id="register-form" class="space-y-4">
@@ -72,7 +68,6 @@
                             <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700">Register</button>
                         </form>
                     </div>
-                    <!-- Login -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-xl font-semibold mb-4">Login</h3>
                         <form id="login-form" class="space-y-4">
@@ -85,13 +80,11 @@
                 </div>
             </section>
 
-            <!-- Profile Section -->
             <section id="profile" class="content-section">
                  <h2 class="text-3xl font-bold mb-6">My Profile</h2>
                  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div id="profile-details" class="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                        <!-- Profile data will be injected here -->
-                    </div>
+                        </div>
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-xl font-semibold mb-4">Profile Picture</h3>
                         <img id="profile-pic-preview" src="https://placehold.co/200x200/e2e8f0/a0aec0?text=No+Image" class="w-48 h-48 rounded-full mx-auto mb-4 object-cover border-4 border-gray-200">
@@ -103,7 +96,6 @@
                  </div>
             </section>
             
-            <!-- Users Section -->
             <section id="users" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Users & Social</h2>
                 <div class="bg-white p-6 rounded-lg shadow-md">
@@ -124,7 +116,6 @@
                  </div>
             </section>
 
-            <!-- Posts Section -->
             <section id="posts" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Posts Feed</h2>
                 <div class="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -141,7 +132,6 @@
                 <div id="posts-container" class="space-y-6"></div>
             </section>
 
-            <!-- Reports Section -->
             <section id="reports" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Environmental Reports</h2>
                  <div class="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -158,7 +148,6 @@
                  <div id="reports-container" class="space-y-6"></div>
             </section>
 
-            <!-- Bills Section -->
             <section id="bills" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Bills & Usage Tracking</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -186,14 +175,12 @@
                 </div>
             </section>
             
-            <!-- Rewards Section -->
             <section id="rewards" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Rewards & Achievements</h2>
                 <button id="fetch-rewards-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4">View Available Rewards</button>
                  <div id="rewards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
             
-            <!-- Leaderboard Section -->
             <section id="leaderboard" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Leaderboard</h2>
                 <div class="flex gap-4 mb-4">
@@ -203,14 +190,12 @@
                 <div id="leaderboard-container" class="bg-white p-6 rounded-lg shadow-md"></div>
             </section>
 
-            <!-- Notifications Section -->
             <section id="notifications" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Notifications</h2>
                  <button id="fetch-notifications-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4">Fetch Notifications</button>
                  <div id="notifications-container" class="space-y-4"></div>
             </section>
 
-            <!-- Admin Section -->
             <section id="admin" class="content-section">
                 <h2 class="text-3xl font-bold mb-6">Admin Panel</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -235,7 +220,6 @@
             </section>
 
 
-            <!-- API Response Viewer -->
             <div class="fixed bottom-0 right-0 w-[400px] bg-gray-900 text-white p-4 rounded-tl-lg shadow-2xl max-h-96 overflow-y-auto z-10">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-lg font-semibold">API Response</h3>
@@ -248,12 +232,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Globals ---
+            // --- Globals & UI Elements ---
+            // ... (same as before) ...
             const API_BASE_URL = 'http://127.0.0.1:5001';
             let jwtToken = localStorage.getItem('jwtToken');
             let currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
-            // --- UI Elements ---
             const sections = document.querySelectorAll('.content-section');
             const sidebarLinks = document.querySelectorAll('.sidebar-link');
             const loader = document.getElementById('loader');
@@ -265,16 +248,11 @@
             // --- Helper Functions ---
             const showLoader = () => loader.classList.remove('hidden');
             const hideLoader = () => loader.classList.add('hidden');
-
             const showResponse = (data) => {
                 apiResponseEl.textContent = JSON.stringify(data, null, 2);
             };
-
-            const clearResponse = () => {
-                apiResponseEl.textContent = '';
-            }
+            const clearResponse = () => { apiResponseEl.textContent = ''; }
             document.getElementById('clear-response-btn').addEventListener('click', clearResponse);
-
             const updateLoginStatus = () => {
                 if (jwtToken && currentUser) {
                     userStatusEl.innerHTML = `Logged in as:<br><span class="font-mono text-xs">${currentUser.email}</span>`;
@@ -291,31 +269,29 @@
                 try {
                     const isFormData = options.body instanceof FormData;
                     const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
-                    
                     if (jwtToken) {
                         headers['Authorization'] = `Bearer ${jwtToken}`;
                     }
-
-                    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-                        ...options,
-                        headers,
-                    });
-
-                    const data = await response.json();
+                    const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+                    const contentType = response.headers.get("content-type");
+                    let data;
+                    if (contentType && contentType.includes("application/json")) {
+                        data = await response.json();
+                    } else {
+                        data = { success: true, message: "Non-JSON response received" };
+                    }
                     showResponse({ status: response.status, body: data });
-
                     if (!response.ok) {
                         console.error('API Error:', data);
-                        if (response.status !== 401 || endpoint.startsWith('/auth/')) {
-                           alert(`Error: ${data.error || data.message || data.msg ||'Unknown error'}`);
+                        if (response.status !== 401 || !endpoint.startsWith('/auth/')) {
+                           alert(`Error: ${data.error || data.message || data.msg || 'Unknown error'}`);
                         }
                     }
                     return data;
                 } catch (error) {
                     console.error('Fetch Error:', error);
-                    const errorMsg = { error: error.message };
-                    showResponse(errorMsg);
-                    alert('An error occurred. Check the console and the API Response window.');
+                    showResponse({ error: error.message });
+                    alert('An error occurred. Check the console.');
                     return null;
                 } finally {
                     hideLoader();
@@ -325,12 +301,8 @@
             // --- Navigation ---
             const showSection = (hash) => {
                 const id = hash.substring(1);
-                sections.forEach(section => {
-                    section.classList.toggle('active', section.id === id);
-                });
-                sidebarLinks.forEach(link => {
-                    link.classList.toggle('active', link.hash === hash);
-                });
+                sections.forEach(section => section.classList.toggle('active', section.id === id));
+                sidebarLinks.forEach(link => link.classList.toggle('active', link.hash === hash));
                 if (jwtToken) {
                      switch(id) {
                         case 'profile': getProfile(); break;
@@ -354,17 +326,13 @@
                 });
             });
 
-
             // --- Authentication ---
             document.getElementById('register-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('register-name').value;
                 const email = document.getElementById('register-email').value;
                 const password = document.getElementById('register-password').value;
-                const data = await apiFetch('/auth/register', {
-                    method: 'POST',
-                    body: JSON.stringify({ name, email, password }),
-                });
+                const data = await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) });
                 if (data && data.success) {
                     alert('Registration successful! You can now log in.');
                     e.target.reset();
@@ -375,10 +343,7 @@
                 e.preventDefault();
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
-                const data = await apiFetch('/auth/login', {
-                    method: 'POST',
-                    body: JSON.stringify({ email, password }),
-                });
+                const data = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
                 if (data && data.success) {
                     jwtToken = data.access_token;
                     currentUser = data.user;
@@ -393,59 +358,40 @@
             logoutButton.addEventListener('click', () => {
                 jwtToken = null;
                 currentUser = null;
-                localStorage.removeItem('jwtToken');
-                localStorage.removeItem('currentUser');
+                localStorage.clear();
                 updateLoginStatus();
                 alert('Logged out.');
                 profilePicPreview.src = "https://placehold.co/200x200/e2e8f0/a0aec0?text=No+Image";
                 showSection('#auth');
             });
             
-            // --- Profile ---
+            // --- Profile & Media ---
             const getProfile = async () => {
                 if (!jwtToken) return;
                 const data = await apiFetch('/auth/profile');
                 const container = document.getElementById('profile-details');
                 if (data && data.success) {
-                    container.innerHTML = `
-                        <p class="mb-2"><strong>User ID:</strong> <span class="font-mono text-sm bg-gray-100 p-1 rounded">${data.user_id}</span></p>
-                        <p class="mb-2"><strong>Name:</strong> ${data.name}</p>
-                        <p class="mb-2"><strong>Email:</strong> ${data.email}</p>
-                        <p class="mb-2"><strong>Points:</strong> <span class="font-bold text-green-600">${data.points}</span></p>
-                        <p class="mb-2"><strong>Level:</strong> <span class="font-bold text-indigo-600">${data.level}</span></p>
-                        <p class="mb-2"><strong>Badges:</strong> ${data.badges.join(', ') || 'None'}</p>
-                        <p class="mb-2"><strong>Carbon Saved:</strong> ${data.carbon_footprint_saved.toFixed(2)} kg CO2</p>
-                        <p class="mb-2"><strong>Followers:</strong> ${data.followers_count}</p>
-                        <p class="mb-2"><strong>Following:</strong> ${data.following_count}</p>
-                    `;
+                    container.innerHTML = `<p class="mb-2"><strong>User ID:</strong> <span class="font-mono text-sm bg-gray-100 p-1 rounded">${data.user_id}</span></p><p class="mb-2"><strong>Name:</strong> ${data.name}</p><p class="mb-2"><strong>Email:</strong> ${data.email}</p><p class="mb-2"><strong>Points:</strong> <span class="font-bold text-green-600">${data.points}</span></p><p class="mb-2"><strong>Level:</strong> <span class="font-bold text-indigo-600">${data.level}</span></p><p class="mb-2"><strong>Badges:</strong> ${data.badges.join(', ') || 'None'}</p><p class="mb-2"><strong>Carbon Saved:</strong> ${data.carbon_footprint_saved.toFixed(2)} kg CO2</p><p class="mb-2"><strong>Followers:</strong> ${data.followers_count}</p><p class="mb-2"><strong>Following:</strong> ${data.following_count}</p>`;
                     if (data.profile_picture_id) {
                         profilePicPreview.src = `${API_BASE_URL}/media/view/${data.profile_picture_id}`;
                     } else {
                         profilePicPreview.src = "https://placehold.co/200x200/e2e8f0/a0aec0?text=No+Image";
                     }
                 } else {
-                    container.innerHTML = `<p class="text-red-500">Could not fetch profile.</p>`
+                    container.innerHTML = `<p class="text-red-500">Could not fetch profile.</p>`;
                 }
             }
 
             document.getElementById('upload-pfp-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 const fileInput = document.getElementById('pfp-file-input');
-                if (fileInput.files.length === 0) {
-                    alert('Please select a file to upload.');
-                    return;
-                }
+                if (fileInput.files.length === 0) return alert('Please select a file.');
                 const formData = new FormData();
                 formData.append('file', fileInput.files[0]);
-
-                const data = await apiFetch('/media/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-
+                const data = await apiFetch('/media/upload', { method: 'POST', body: formData });
                 if (data && data.success) {
                     alert('Profile picture updated!');
-                    getProfile(); // Refresh profile to show new picture
+                    getProfile();
                 }
             });
 
@@ -457,22 +403,9 @@
                 const data = await apiFetch(`/users/search?q=${encodeURIComponent(query)}`);
                 const container = document.getElementById('search-results');
                 if (data && data.success) {
-                    if (data.users.length === 0) {
-                        container.innerHTML = `<p>No users found.</p>`;
-                        return;
-                    }
-                    container.innerHTML = data.users.map(u => `
-                        <div class="p-2 border-b flex justify-between items-center">
-                            <div>
-                                <p>${u.name} (Level ${u.level})</p>
-                                <p class="text-xs text-gray-500 font-mono">${u.user_id}</p>
-                            </div>
-                            <button class="follow-btn bg-blue-500 text-white px-3 py-1 rounded-md text-sm" data-user-id="${u.user_id}">Follow</button>
-                        </div>
-                    `).join('');
+                    container.innerHTML = data.users.length ? data.users.map(u => `<div class="p-2 border-b flex justify-between items-center"><div><p>${u.name} (Level ${u.level})</p><p class="text-xs text-gray-500 font-mono">${u.user_id}</p></div><button class="follow-btn bg-blue-500 text-white px-3 py-1 rounded-md text-sm" data-user-id="${u.user_id}">Follow</button></div>`).join('') : `<p>No users found.</p>`;
                 }
             });
-
             const followUser = async (userId, button) => {
                 const data = await apiFetch(`/users/${userId}/follow`, { method: 'POST' });
                 if(data && data.success) {
@@ -480,166 +413,66 @@
                     button.textContent = data.message.includes('unfollowed') ? 'Follow' : 'Unfollow';
                 }
             }
-
-            const fetchFollowList = async (type) => { // type is 'followers' or 'following'
+            const fetchFollowList = async (type) => {
                  if (!currentUser) return;
                  const data = await apiFetch(`/users/${currentUser.user_id}/${type}`);
                  const container = document.getElementById('follow-list');
                  if (data && data.success) {
                      const list = data[type];
-                     if (list.length === 0) {
-                         container.innerHTML = `<p>No ${type} found.</p>`;
-                         return;
-                     }
-                     container.innerHTML = `
-                        <h4 class="font-semibold capitalize">${type} (${data.count})</h4>
-                        ${list.map(u => `<div class="p-2 border-b">${u.name}</div>`).join('')}
-                     `;
+                     container.innerHTML = list.length ? `<h4 class="font-semibold capitalize">${type} (${data.count})</h4>${list.map(u => `<div class="p-2 border-b">${u.name}</div>`).join('')}` : `<p>No ${type} found.</p>`;
                  }
             }
-             document.getElementById('view-followers-btn').addEventListener('click', () => fetchFollowList('followers'));
-             document.getElementById('view-following-btn').addEventListener('click', () => fetchFollowList('following'));
+            document.getElementById('view-followers-btn').addEventListener('click', () => fetchFollowList('followers'));
+            document.getElementById('view-following-btn').addEventListener('click', () => fetchFollowList('following'));
 
             // --- Posts ---
             document.getElementById('create-post-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 const content = document.getElementById('post-content').value;
-                const data = await apiFetch('/posts', {
-                    method: 'POST',
-                    body: JSON.stringify({ content })
-                });
+                const data = await apiFetch('/posts', { method: 'POST', body: JSON.stringify({ content }) });
                 if(data && data.success) {
                     alert('Post created!');
                     e.target.reset();
                     document.getElementById('fetch-recent-posts-btn').click();
                 }
             });
-
             const fetchPosts = async (sort) => {
                  const data = await apiFetch(`/posts?sort=${sort}`);
                  const container = document.getElementById('posts-container');
                  if (data && data.success) {
-                    if (data.posts.length === 0) {
-                        container.innerHTML = `<p>No posts found.</p>`;
-                        return;
-                    }
-                    container.innerHTML = data.posts.map(p => {
-                        const avatarUrl = p.user.profile_picture_id 
-                            ? `${API_BASE_URL}/media/view/${p.user.profile_picture_id}`
-                            : `https://placehold.co/40x40/e2e8f0/a0aec0?text=${p.user.name.charAt(0)}`;
-
-                        return `
-                        <div class="bg-white p-4 rounded-lg shadow">
-                            <div class="flex items-center mb-3">
-                                <img src="${avatarUrl}" class="w-10 h-10 rounded-full mr-3 object-cover border">
-                                <div>
-                                    <div class="font-semibold">${p.user.name}</div>
-                                    <div class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</div>
-                                </div>
-                            </div>
-                            <p class="my-2 text-gray-800">${p.content}</p>
-                            <div class="flex items-center gap-4 mt-2 text-gray-600">
-                                <button class="like-post-btn flex items-center gap-1" data-post-id="${p.post_id}">❤️ <span id="likes-count-${p.post_id}">${p.likes_count}</span></button>
-                                <button class="comment-post-btn flex items-center gap-1" data-post-id="${p.post_id}">💬 <span id="comments-count-${p.post_id}">${p.comments_count}</span></button>
-                                ${currentUser && p.user.user_id === currentUser.user_id ? `<button class="delete-post-btn text-red-500 ml-auto" data-post-id="${p.post_id}">Delete</button>` : ''}
-                            </div>
-                            <div id="comments-section-${p.post_id}" class="hidden mt-4 pt-4 border-t"></div>
-                        </div>
-                    `}).join('');
+                    container.innerHTML = data.posts.length ? data.posts.map(p => {
+                        const avatarUrl = p.user.profile_picture_id ? `${API_BASE_URL}/media/view/${p.user.profile_picture_id}` : `https://placehold.co/40x40/e2e8f0/a0aec0?text=${p.user.name.charAt(0)}`;
+                        return `<div class="bg-white p-4 rounded-lg shadow"><div class="flex items-center mb-3"><img src="${avatarUrl}" class="w-10 h-10 rounded-full mr-3 object-cover border"><div><div class="font-semibold">${p.user.name}</div><div class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</div></div></div><p class="my-2 text-gray-800">${p.content}</p><div class="flex items-center gap-4 mt-2 text-gray-600"><button class="like-post-btn flex items-center gap-1" data-post-id="${p.post_id}">❤️ <span id="likes-count-${p.post_id}">${p.likes_count}</span></button><button class="comment-post-btn flex items-center gap-1" data-post-id="${p.post_id}">💬 <span id="comments-count-${p.post_id}">${p.comments_count}</span></button>${currentUser && p.user.user_id === currentUser.user_id ? `<button class="delete-post-btn text-red-500 ml-auto" data-post-id="${p.post_id}">Delete</button>` : ''}</div><div id="comments-section-${p.post_id}" class="hidden mt-4 pt-4 border-t"></div></div>`
+                    }).join('') : `<p>No posts found.</p>`;
                  }
             };
             document.getElementById('fetch-recent-posts-btn').addEventListener('click', () => fetchPosts('recent'));
             document.getElementById('fetch-trending-posts-btn').addEventListener('click', () => fetchPosts('trending'));
             
-             const fetchComments = async (postId) => {
+            const fetchComments = async (postId) => {
                 const container = document.getElementById(`comments-section-${postId}`);
                 container.innerHTML = '<p class="text-sm text-gray-500">Loading comments...</p>';
                 const data = await apiFetch(`/posts/${postId}/comments`);
                 if(data && data.success) {
                     let commentsHTML = '<h4>Comments</h4>';
                     if (data.comments.length > 0) {
-                        commentsHTML += data.comments.map(c => `
-                            <div class="p-2 border-b text-sm">
-                                <strong>${c.user.name}:</strong> ${c.text}
-                                <div class="text-xs text-gray-400">${new Date(c.created_at).toLocaleString()}</div>
-                            </div>
-                        `).join('');
+                        commentsHTML += data.comments.map(c => `<div class="p-2 border-b text-sm"><strong>${c.user.name}:</strong> ${c.text}<div class="text-xs text-gray-400">${new Date(c.created_at).toLocaleString()}</div></div>`).join('');
                     } else {
                         commentsHTML += '<p class="text-sm text-gray-500">No comments yet.</p>';
                     }
-                    commentsHTML += `
-                        <form class="add-comment-form mt-2 flex gap-2" data-post-id="${postId}">
-                            <input type="text" placeholder="Add a comment..." class="flex-grow p-1 border rounded-md text-sm" required>
-                            <button type="submit" class="bg-indigo-500 text-white px-3 py-1 text-sm rounded-md">Add</button>
-                        </form>
-                    `;
+                    commentsHTML += `<form class="add-comment-form mt-2 flex gap-2" data-post-id="${postId}"><input type="text" placeholder="Add a comment..." class="flex-grow p-1 border rounded-md text-sm" required><button type="submit" class="bg-indigo-500 text-white px-3 py-1 text-sm rounded-md">Add</button></form>`;
                     container.innerHTML = commentsHTML;
                 }
-             };
+            };
             
-            document.addEventListener('submit', async e => {
-                if (e.target.classList.contains('add-comment-form')) {
-                    e.preventDefault();
-                    const postId = e.target.dataset.postId;
-                    const textInput = e.target.querySelector('input');
-                    const text = textInput.value;
-                    if(text) {
-                        const data = await apiFetch(`/posts/${postId}/comment`, { method: 'POST', body: JSON.stringify({text}) });
-                        if(data && data.success) {
-                            fetchComments(postId); // Refresh comments after adding
-                            const countEl = document.getElementById(`comments-count-${postId}`);
-                            countEl.textContent = parseInt(countEl.textContent) + 1;
-                        }
-                    }
-                }
-            });
-
-            document.addEventListener('click', async e => {
-                const target = e.target;
-                if (target.closest('.like-post-btn')) {
-                    const button = target.closest('.like-post-btn');
-                    const postId = button.dataset.postId;
-                    const data = await apiFetch(`/posts/${postId}/like`, { method: 'POST' });
-                    if(data && data.success) {
-                        document.getElementById(`likes-count-${postId}`).textContent = data.likes_count;
-                    }
-                }
-                if (target.closest('.comment-post-btn')) {
-                    const button = target.closest('.comment-post-btn');
-                    const postId = button.dataset.postId;
-                    const commentsSection = document.getElementById(`comments-section-${postId}`);
-                    const isHidden = commentsSection.classList.toggle('hidden');
-                    if (!isHidden && commentsSection.innerHTML.includes('Loading')) {
-                        fetchComments(postId);
-                    }
-                }
-                if (target.closest('.delete-post-btn')) {
-                     const button = target.closest('.delete-post-btn');
-                     const postId = button.dataset.postId;
-                     if(confirm('Are you sure you want to delete this post?')) {
-                        const data = await apiFetch(`/posts/${postId}`, { method: 'DELETE' });
-                        if(data && data.success) {
-                            alert('Post deleted.');
-                            button.closest('.bg-white').remove();
-                        }
-                     }
-                }
-                 if (target.classList.contains('follow-btn')) {
-                    const userId = target.dataset.userId;
-                    followUser(userId, target);
-                }
-            });
-
-
             // --- Reports ---
             const fetchReportCategories = async () => {
                 const data = await apiFetch('/reports/categories');
                 const select = document.getElementById('report-category');
-                if (data && data.success) {
+                if (data && data.success && select) {
                     select.innerHTML = data.categories.map(c => `<option value="${c}">${c}</option>`).join('');
                 }
             };
-
             document.getElementById('create-report-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 const report = {
@@ -655,68 +488,25 @@
                     document.getElementById('fetch-reports-btn').click();
                  }
             });
-
             document.getElementById('fetch-reports-btn').addEventListener('click', async () => {
                 const data = await apiFetch('/reports');
                 const container = document.getElementById('reports-container');
                 if (data && data.success) {
-                    if (data.reports.length === 0) {
-                         container.innerHTML = '<p>No reports found.</p>';
-                         return;
-                    }
-                    container.innerHTML = data.reports.map(r => `
-                        <div class="bg-white p-4 rounded-lg shadow">
-                             <h4 class="font-bold text-lg">${r.title}</h4>
-                             <p class="text-sm bg-indigo-100 text-indigo-700 inline-block px-2 py-0.5 rounded-full">${r.category}</p>
-                             <p class="text-gray-600 mt-1">${r.location}</p>
-                             <p class="my-2">${r.description}</p>
-                             <div class="text-xs text-gray-500">By ${r.user.name} on ${new Date(r.created_at).toLocaleDateString()}</div>
-                             <div class="flex items-center gap-4 mt-2">
-                                <button class="like-report-btn" data-report-id="${r.report_id}">👍 <span id="report-likes-${r.report_id}">${r.likes_count}</span></button>
-                                <button class="verify-report-btn" data-report-id="${r.report_id}">✅ <span id="report-verifs-${r.report_id}">${r.verification_count}</span></button>
-                             </div>
-                        </div>
-                    `).join('');
+                    container.innerHTML = data.reports.length ? data.reports.map(r => `<div class="bg-white p-4 rounded-lg shadow"><h4 class="font-bold text-lg">${r.title || 'Untitled Report'}</h4><p class="text-sm bg-indigo-100 text-indigo-700 inline-block px-2 py-0.5 rounded-full my-1">${r.category}</p><p class="text-gray-600 mt-1 font-semibold">${r.location}</p><p class="my-2">${r.description}</p><div class="text-xs text-gray-500">By ${r.user.name} on ${new Date(r.created_at).toLocaleDateString()}</div><div class="flex items-center gap-4 mt-2"><button class="like-report-btn" data-report-id="${r.report_id}">👍 <span id="report-likes-${r.report_id}">${r.likes_count}</span></button><button class="verify-report-btn" data-report-id="${r.report_id}">✅ <span id="report-verifs-${r.report_id}">${r.verification_count}</span></button></div></div>`).join('') : '<p>No reports found.</p>';
                 }
             });
-            
-             document.addEventListener('click', async e => {
-                const reportBtn = e.target.closest('.like-report-btn, .verify-report-btn');
-                if(!reportBtn) return;
-
-                const reportId = reportBtn.dataset.reportId;
-                const isLike = reportBtn.classList.contains('like-report-btn');
-                const endpoint = isLike ? `/reports/${reportId}/like` : `/reports/${reportId}/verify`;
-                const data = await apiFetch(endpoint, { method: 'POST' });
-
-                if (data && data.success) {
-                    if(isLike) {
-                        document.getElementById(`report-likes-${reportId}`).textContent = data.likes_count;
-                    } else {
-                        document.getElementById(`report-verifs-${reportId}`).textContent = data.verification_count;
-                    }
-                }
-             });
-
 
             // --- Bills ---
-             const fetchBillTypes = async () => {
+            const fetchBillTypes = async () => {
                 const data = await apiFetch('/bills/types');
                 const select = document.getElementById('bill-type');
-                if (data && data.success) {
+                if (data && data.success && select) {
                     select.innerHTML = Object.keys(data.bill_types).map(c => `<option value="${c}">${c.charAt(0).toUpperCase() + c.slice(1)}</option>`).join('');
                 }
             };
-            
             document.getElementById('manual-bill-form').addEventListener('submit', async e => {
                 e.preventDefault();
-                const bill = {
-                    type: document.getElementById('bill-type').value,
-                    usage_amount: parseFloat(document.getElementById('bill-usage').value),
-                    usage_unit: document.getElementById('bill-unit').value,
-                    cost: parseFloat(document.getElementById('bill-cost').value),
-                    billing_period: document.getElementById('bill-period').value
-                };
+                const bill = { type: document.getElementById('bill-type').value, usage_amount: parseFloat(document.getElementById('bill-usage').value), usage_unit: document.getElementById('bill-unit').value, cost: parseFloat(document.getElementById('bill-cost').value), billing_period: document.getElementById('bill-period').value };
                 const data = await apiFetch('/bills/manual-entry', { method: 'POST', body: JSON.stringify(bill) });
                 if(data && data.success) {
                     alert('Bill recorded!');
@@ -724,35 +514,16 @@
                     document.getElementById('fetch-bills-history-btn').click();
                 }
             });
-
             document.getElementById('fetch-bills-history-btn').addEventListener('click', async () => {
                 if(!currentUser) return;
                 const data = await apiFetch(`/bills/history/${currentUser.user_id}`);
                 const container = document.getElementById('bills-history-container');
                 if (data && data.success) {
-                     if (data.bills.length === 0) {
-                         container.innerHTML = '<p>No bill history found.</p>';
-                         return;
-                    }
-                    container.innerHTML = `
-                        <div class="grid grid-cols-5 font-bold p-2 bg-gray-200 rounded-t-md text-sm">
-                            <span>Type</span><span>Period</span><span>Usage</span><span>Cost</span><span>Date</span>
-                        </div>
-                        ${data.bills.map(b => `
-                             <div class="grid grid-cols-5 p-2 border-b text-sm">
-                                 <span class="capitalize">${b.type}</span>
-                                 <span>${b.billing_period}</span>
-                                 <span>${b.usage_amount} ${b.usage_unit}</span>
-                                 <span>₹${b.cost.toFixed(2)}</span>
-                                 <span>${new Date(b.created_at).toLocaleDateString()}</span>
-                             </div>
-                        `).join('')}
-                    `;
+                     container.innerHTML = data.bills.length ? `<div class="grid grid-cols-5 font-bold p-2 bg-gray-200 rounded-t-md text-sm"><span>Type</span><span>Period</span><span>Usage</span><span>Cost</span><span>Date</span></div>${data.bills.map(b => `<div class="grid grid-cols-5 p-2 border-b text-sm"><span class="capitalize">${b.type}</span><span>${b.billing_period}</span><span>${b.usage_amount} ${b.usage_unit}</span><span>₹${b.cost.toFixed(2)}</span><span>${new Date(b.created_at).toLocaleDateString()}</span></div>`).join('')}` : '<p>No bill history found.</p>';
                 }
             });
-            
             document.getElementById('fetch-analytics-btn').addEventListener('click', async () => {
-                 if(!currentUser) return;
+                if(!currentUser) return;
                 const data = await apiFetch(`/bills/analytics/${currentUser.user_id}`);
                 const container = document.getElementById('analytics-container');
                 if(data && data.success) {
@@ -765,56 +536,18 @@
                 const data = await apiFetch('/rewards');
                 const container = document.getElementById('rewards-container');
                 if (data && data.success) {
-                    container.innerHTML = data.rewards.map(r => `
-                        <div class="bg-white p-4 rounded-lg shadow flex flex-col">
-                            <h4 class="font-bold text-lg">${r.title}</h4>
-                            <p class="text-sm text-gray-600 flex-grow">${r.description}</p>
-                            <div class="mt-4">
-                                <p><strong>Points:</strong> ${r.points_required}</p>
-                                ${r.badge_name ? `<p><strong>Badge:</strong> ${r.badge_name}</p>`: ''}
-                                <p class="text-xs mt-1"><strong>Task:</strong> ${r.task_type} (${r.task_count})</p>
-                            </div>
-                            <button 
-                                class="claim-reward-btn mt-4 w-full py-2 rounded-md text-white ${r.already_claimed ? 'bg-gray-400 cursor-not-allowed' : (r.eligible ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-500 cursor-not-allowed')}"
-                                data-reward-id="${r.reward_id}" 
-                                ${r.already_claimed || !r.eligible ? 'disabled' : ''}>
-                                ${r.already_claimed ? 'Claimed' : (r.eligible ? 'Claim' : 'Not Eligible')}
-                            </button>
-                        </div>
-                    `).join('');
-                }
-            });
-
-            document.addEventListener('click', async e => {
-                if (e.target.classList.contains('claim-reward-btn')) {
-                    const rewardId = e.target.dataset.rewardId;
-                    const data = await apiFetch(`/rewards/claim/${rewardId}`, { method: 'POST' });
-                    if(data && data.success) {
-                        alert('Reward claimed!');
-                        document.getElementById('fetch-rewards-btn').click(); // Refresh list
-                    }
+                    container.innerHTML = data.rewards.map(r => `<div class="bg-white p-4 rounded-lg shadow flex flex-col"><h4 class="font-bold text-lg">${r.title}</h4><p class="text-sm text-gray-600 flex-grow">${r.description}</p><div class="mt-4"><p><strong>Points:</strong> ${r.points_required}</p>${r.badge_name ? `<p><strong>Badge:</strong> ${r.badge_name}</p>`: ''}<p class="text-xs mt-1"><strong>Task:</strong> ${r.task_type} (${r.task_count})</p></div><button class="claim-reward-btn mt-4 w-full py-2 rounded-md text-white ${r.already_claimed ? 'bg-gray-400 cursor-not-allowed' : (r.eligible ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-500 cursor-not-allowed')}" data-reward-id="${r.reward_id}" ${r.already_claimed || !r.eligible ? 'disabled' : ''}>${r.already_claimed ? 'Claimed' : (r.eligible ? 'Claim' : 'Not Eligible')}</button></div>`).join('');
                 }
             });
 
             // --- Leaderboard ---
-            const fetchLeaderboard = async (type) => { // 'global' or 'friends'
-                if (type === 'friends' && !currentUser) {
-                    alert('You must be logged in to see the friends leaderboard.');
-                    return;
-                }
+            const fetchLeaderboard = async (type) => {
+                if (type === 'friends' && !currentUser) return alert('You must be logged in.');
                 const endpoint = type === 'global' ? '/leaderboard/global' : `/leaderboard/friends/${currentUser.user_id}`;
                 const data = await apiFetch(endpoint);
                 const container = document.getElementById('leaderboard-container');
                 if (data && data.success) {
-                     container.innerHTML = `
-                        <h3 class="text-xl font-semibold mb-2 capitalize">${type} Leaderboard</h3>
-                        ${data.leaderboard.map(u => `
-                            <div class="p-2 border-b flex justify-between">
-                                <span><strong>${u.rank}.</strong> ${u.name}</span>
-                                <span>${u.points} Points</span>
-                            </div>
-                        `).join('')}
-                     `;
+                     container.innerHTML = `<h3 class="text-xl font-semibold mb-2 capitalize">${type} Leaderboard</h3>${data.leaderboard.map(u => `<div class="p-2 border-b flex justify-between"><span><strong>${u.rank}.</strong> ${u.name}</span><span>${u.points} Points</span></div>`).join('')}`;
                 }
             };
             document.getElementById('fetch-global-leaderboard-btn').addEventListener('click', () => fetchLeaderboard('global'));
@@ -826,41 +559,20 @@
                 const data = await apiFetch(`/notifications/${currentUser.user_id}`);
                 const container = document.getElementById('notifications-container');
                 if (data && data.success) {
-                    if (data.notifications.length === 0) {
-                        container.innerHTML = '<p>No notifications.</p>';
-                        return;
-                    }
-                    container.innerHTML = `
-                        <p class="mb-2"><strong>Unread:</strong> ${data.unread_count}</p>
-                        ${data.notifications.map(n => `
-                            <div class="p-3 rounded-md ${n.is_read ? 'bg-gray-200' : 'bg-blue-100'}">
-                                <p class="font-semibold">${n.title}</p>
-                                <p>${n.message}</p>
-                                <p class="text-xs text-gray-500">${new Date(n.created_at).toLocaleString()}</p>
-                            </div>
-                        `).join('')}
-                    `;
+                    container.innerHTML = data.notifications.length ? `<p class="mb-2"><strong>Unread:</strong> ${data.unread_count}</p>${data.notifications.map(n => `<div class="p-3 rounded-md ${n.is_read ? 'bg-gray-200' : 'bg-blue-100'}"><p class="font-semibold">${n.title}</p><p>${n.message}</p><p class="text-xs text-gray-500">${new Date(n.created_at).toLocaleString()}</p></div>`).join('')}` : '<p>No notifications.</p>';
                 }
             });
             
             // --- Admin ---
             document.getElementById('create-reward-form').addEventListener('submit', async e => {
                  e.preventDefault();
-                 const reward = {
-                    title: document.getElementById('reward-title').value,
-                    description: document.getElementById('reward-description').value,
-                    points_required: parseInt(document.getElementById('reward-points').value),
-                    badge_name: document.getElementById('reward-badge').value,
-                    task_type: document.getElementById('reward-task-type').value,
-                    task_count: parseInt(document.getElementById('reward-task-count').value),
-                 };
+                 const reward = { title: document.getElementById('reward-title').value, description: document.getElementById('reward-description').value, points_required: parseInt(document.getElementById('reward-points').value), badge_name: document.getElementById('reward-badge').value, task_type: document.getElementById('reward-task-type').value, task_count: parseInt(document.getElementById('reward-task-count').value) };
                  const data = await apiFetch('/admin/rewards', {method: 'POST', body: JSON.stringify(reward)});
                  if(data && data.success) {
                     alert('Reward created!');
                     e.target.reset();
                  }
             });
-
             document.getElementById('fetch-admin-stats-btn').addEventListener('click', async() => {
                 const data = await apiFetch('/admin/stats');
                 const container = document.getElementById('admin-stats-container');
@@ -868,17 +580,83 @@
                     container.innerHTML = `<pre class="text-xs bg-gray-100 p-2 rounded">${JSON.stringify(data, null, 2)}</pre>`;
                 }
             });
+            
+            // --- CONSOLIDATED EVENT LISTENERS ---
+            document.addEventListener('submit', async e => {
+                if (e.target.classList.contains('add-comment-form')) {
+                    e.preventDefault();
+                    const postId = e.target.dataset.postId;
+                    const textInput = e.target.querySelector('input');
+                    const text = textInput.value;
+                    if(text) {
+                        const data = await apiFetch(`/posts/${postId}/comment`, { method: 'POST', body: JSON.stringify({text}) });
+                        if(data && data.success) {
+                            fetchComments(postId);
+                            const countEl = document.getElementById(`comments-count-${postId}`);
+                            countEl.textContent = parseInt(countEl.textContent) + 1;
+                        }
+                    }
+                }
+            });
+            document.addEventListener('click', async e => {
+                const target = e.target;
+                const likeBtn = target.closest('.like-post-btn');
+                const commentBtn = target.closest('.comment-post-btn');
+                const deleteBtn = target.closest('.delete-post-btn');
+                const followBtn = target.closest('.follow-btn');
+                const reportInteractionBtn = target.closest('.like-report-btn, .verify-report-btn');
+                const claimRewardBtn = target.closest('.claim-reward-btn');
 
+                if (likeBtn) {
+                    const postId = likeBtn.dataset.postId;
+                    const data = await apiFetch(`/posts/${postId}/like`, { method: 'POST' });
+                    if(data && data.success) {
+                        document.getElementById(`likes-count-${postId}`).textContent = data.likes_count;
+                    }
+                } else if (commentBtn) {
+                    const postId = commentBtn.dataset.postId;
+                    const commentsSection = document.getElementById(`comments-section-${postId}`);
+                    const isNowHidden = commentsSection.classList.toggle('hidden');
+                    if (!isNowHidden && !commentsSection.hasChildNodes()) { // Only fetch if opening and empty
+                        fetchComments(postId);
+                    }
+                } else if (deleteBtn) {
+                     if(confirm('Are you sure you want to delete this post?')) {
+                        const postId = deleteBtn.dataset.postId;
+                        const data = await apiFetch(`/posts/${postId}`, { method: 'DELETE' });
+                        if(data && data.success) {
+                            alert('Post deleted.');
+                            deleteBtn.closest('.bg-white').remove();
+                        }
+                     }
+                } else if (followBtn) {
+                    followUser(followBtn.dataset.userId, followBtn);
+                } else if (reportInteractionBtn) {
+                    const reportId = reportInteractionBtn.dataset.reportId;
+                    const isLike = reportInteractionBtn.classList.contains('like-report-btn');
+                    const endpoint = isLike ? `/reports/${reportId}/like` : `/reports/${reportId}/verify`;
+                    const data = await apiFetch(endpoint, { method: 'POST' });
+                    if (data && data.success) {
+                        if(isLike) document.getElementById(`report-likes-${reportId}`).textContent = data.likes_count;
+                        else document.getElementById(`report-verifs-${reportId}`).textContent = data.verification_count;
+                    }
+                } else if (claimRewardBtn) {
+                    const rewardId = claimRewardBtn.dataset.rewardId;
+                    const data = await apiFetch(`/rewards/claim/${rewardId}`, { method: 'POST' });
+                    if(data && data.success) {
+                        alert('Reward claimed!');
+                        document.getElementById('fetch-rewards-btn').click();
+                    }
+                }
+            });
 
             // --- Initial Load ---
             const init = () => {
                 updateLoginStatus();
                 showSection(window.location.hash || '#auth');
             };
-
             init();
         });
     </script>
 </body>
 </html>
-

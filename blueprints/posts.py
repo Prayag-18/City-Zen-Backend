@@ -4,7 +4,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.database import Post, User, Notification
 from utils.validators import validate_required_fields
 from utils.responses import success_response, error_response
-from utils.pagination import paginate_results
 
 posts_bp = Blueprint('posts', __name__)
 post_model = Post()
@@ -23,13 +22,11 @@ def create_post():
         
         data = request.get_json()
         
-        # Validate required fields
         required_fields = ['content']
         validation_error = validate_required_fields(data, required_fields)
         if validation_error:
             return error_response(validation_error, 400)
         
-        # Create post
         post_data = {
             'user_id': current_user['user_id'],
             'content': data['content'],
@@ -38,7 +35,6 @@ def create_post():
         
         post_id = post_model.create_post(post_data)
         
-        # Award points for creating post
         user_model.add_points(current_user['user_id'], 10)
         
         return success_response({
@@ -53,34 +49,21 @@ def create_post():
 @jwt_required()
 def get_posts():
     try:
-        # Get pagination parameters
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 20))
-        sort_by = request.args.get('sort', 'recent')  # recent, trending
-        user_id = request.args.get('user_id')  # Filter by specific user
+        sort_by = request.args.get('sort', 'recent')
+        user_id = request.args.get('user_id')
         
         skip = (page - 1) * limit
         
-        # Build query
         query = {}
         if user_id:
             query['user_id'] = user_id
         
-        # Build sort criteria
-        if sort_by == 'trending':
-            sort_criteria = [('likes_count', -1), ('created_at', -1)]
-        else:  # recent
-            sort_criteria = [('created_at', -1)]
+        sort_criteria = [('likes_count', -1), ('created_at', -1)] if sort_by == 'trending' else [('created_at', -1)]
         
-        # Get posts
-        posts = post_model.find(
-            query=query,
-            sort=sort_criteria,
-            limit=limit,
-            skip=skip
-        )
+        posts = post_model.find(query=query, sort=sort_criteria, limit=limit, skip=skip)
         
-        # Enrich posts with user information
         enriched_posts = []
         for post in posts:
             user = user_model.find_one({'user_id': post['user_id']})
@@ -95,7 +78,7 @@ def get_posts():
                     'user': {
                         'user_id': user['user_id'],
                         'name': user['name'],
-                        'level': user['level'],
+                        'level': user.get('level', 1),
                         'profile_picture_id': user.get('profile_picture_id')
                     }
                 }
@@ -121,17 +104,14 @@ def like_post(post_id):
         if not current_user:
             return error_response('User not found', 404)
         
-        # Like/unlike the post
         success = post_model.like_post(post_id, current_user['user_id'])
         
         if not success:
             return error_response('Post not found', 404)
         
-        # Get updated post to check like status
         post = post_model.find_one({'post_id': post_id})
         liked = current_user['user_id'] in post.get('likes', [])
         
-        # Create notification for post owner (if liked, not unliked)
         if liked and post['user_id'] != current_user['user_id']:
             notification_model.create_notification({
                 'user_id': post['user_id'],
@@ -162,19 +142,15 @@ def add_comment(post_id):
         
         data = request.get_json()
         
-        # Validate required fields
-        required_fields = ['text']
-        validation_error = validate_required_fields(data, required_fields)
+        validation_error = validate_required_fields(data, ['text'])
         if validation_error:
             return error_response(validation_error, 400)
         
-        # Add comment
         result = post_model.add_comment(post_id, current_user['user_id'], data['text'])
         
         if result.modified_count == 0:
             return error_response('Post not found', 404)
         
-        # Get post owner for notification
         post = post_model.find_one({'post_id': post_id})
         if post and post['user_id'] != current_user['user_id']:
             notification_model.create_notification({
@@ -185,7 +161,6 @@ def add_comment(post_id):
                 'data': {'post_id': post_id, 'commenter_id': current_user['user_id']}
             })
         
-        # Award points for commenting
         user_model.add_points(current_user['user_id'], 5)
         
         return success_response({'message': 'Comment added successfully'}, 201)
@@ -193,6 +168,7 @@ def add_comment(post_id):
     except Exception as e:
         return error_response(f'Failed to add comment: {str(e)}', 500)
 
+# --- THIS FUNCTION WAS MISSING ---
 @posts_bp.route('/<post_id>/comments', methods=['GET'])
 @jwt_required()
 def get_comments(post_id):
@@ -204,7 +180,6 @@ def get_comments(post_id):
         
         comments = post.get('comments', [])
         
-        # Enrich comments with user information
         enriched_comments = []
         for comment in comments:
             user = user_model.find_one({'user_id': comment['user_id']})
@@ -221,7 +196,6 @@ def get_comments(post_id):
                 }
                 enriched_comments.append(comment_data)
         
-        # Sort comments by creation time (newest first)
         enriched_comments.sort(key=lambda x: x['created_at'], reverse=True)
         
         return success_response({
@@ -231,6 +205,7 @@ def get_comments(post_id):
         
     except Exception as e:
         return error_response(f'Failed to get comments: {str(e)}', 500)
+# ------------------------------------
 
 @posts_bp.route('/<post_id>', methods=['DELETE'])
 @jwt_required()
@@ -242,7 +217,6 @@ def delete_post(post_id):
         if not current_user:
             return error_response('User not found', 404)
         
-        # Check if post exists and belongs to current user
         post = post_model.find_one({'post_id': post_id})
         
         if not post:
@@ -251,7 +225,6 @@ def delete_post(post_id):
         if post['user_id'] != current_user['user_id']:
             return error_response('Unauthorized to delete this post', 403)
         
-        # Delete the post
         result = post_model.delete_one({'post_id': post_id})
         
         if result.deleted_count == 0:

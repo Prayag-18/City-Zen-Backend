@@ -1,6 +1,6 @@
 # 🏙️ City-Zen: Gamified Urban Sustainability Platform
 
-![City-Zen Banner](https://placehold.co/1200x300/4f46e5/ffffff?text=City-Zen&font=raleway)
+![City-Zen Banner](https://placehold.co/1200x300/22c55e/ffffff?text=City-Zen&font=poppins)
 
 **City-Zen is a comprehensive web platform designed to empower urban citizens to take meaningful environmental action. By combining social networking, gamification, and resource tracking, City-Zen transforms sustainability into an engaging and rewarding community experience.**
 

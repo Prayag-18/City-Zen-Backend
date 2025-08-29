@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City-Zen Backend Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-link { transition: all 0.2s ease-in-out; }
+        .sidebar-link:hover, .sidebar-link.active { background-color: #4f46e5; color: white; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-800 text-white p-4 flex flex-col fixed h-full">
+            <h1 class="text-2xl font-bold mb-6">City-Zen Tester</h1>
+            <nav class="flex flex-col space-y-2">
+                <a href="#auth" class="sidebar-link px-4 py-2 rounded-md">Auth</a>
+                <a href="#profile" class="sidebar-link px-4 py-2 rounded-md">Profile</a>
+                <a href="#users" class="sidebar-link px-4 py-2 rounded-md">Users & Social</a>
+                <a href="#posts" class="sidebar-link px-4 py-2 rounded-md">Posts</a>
+                <a href="#reports" class="sidebar-link px-4 py-2 rounded-md">Reports</a>
+                <a href="#bills" class="sidebar-link px-4 py-2 rounded-md">Bills & Usage</a>
+                <a href="#rewards" class="sidebar-link px-4 py-2 rounded-md">Rewards</a>
+                <a href="#leaderboard" class="sidebar-link px-4 py-2 rounded-md">Leaderboard</a>
+                <a href="#notifications" class="sidebar-link px-4 py-2 rounded-md">Notifications</a>
+                <a href="#admin" class="sidebar-link px-4 py-2 rounded-md">Admin</a>
+            </nav>
+            <div class="mt-auto">
+                <div class="p-2 bg-gray-700 rounded-lg">
+                    <h3 class="font-semibold">API Status</h3>
+                    <div id="user-status" class="text-sm text-gray-300">Logged out</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-8 overflow-y-auto">
+            <div id="loader" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                <div class="loader"></div>
+            </div>
+
+            <!-- Auth Section -->
+            <section id="auth" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Authentication</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Registration -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Register</h3>
+                        <form id="register-form" class="space-y-4">
+                            <input type="text" id="register-name" placeholder="Name" class="w-full p-2 border rounded-md" required>
+                            <input type="email" id="register-email" placeholder="Email" class="w-full p-2 border rounded-md" required>
+                            <input type="password" id="register-password" placeholder="Password" class="w-full p-2 border rounded-md" required>
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700">Register</button>
+                        </form>
+                    </div>
+                    <!-- Login -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Login</h3>
+                        <form id="login-form" class="space-y-4">
+                            <input type="email" id="login-email" placeholder="Email" class="w-full p-2 border rounded-md" required>
+                            <input type="password" id="login-password" placeholder="Password" class="w-full p-2 border rounded-md" required>
+                            <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Login</button>
+                        </form>
+                         <button id="logout-button" class="mt-4 w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 hidden">Logout</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile" class="content-section">
+                 <h2 class="text-3xl font-bold mb-6">My Profile</h2>
+                 <div id="profile-details" class="bg-white p-6 rounded-lg shadow-md">
+                     <!-- Profile data will be injected here -->
+                 </div>
+            </section>
+            
+            <!-- Users Section -->
+            <section id="users" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Users & Social</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Search Users</h3>
+                    <form id="search-users-form" class="flex gap-2">
+                        <input type="text" id="search-query" placeholder="Search by name..." class="flex-grow p-2 border rounded-md">
+                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Search</button>
+                    </form>
+                    <div id="search-results" class="mt-4"></div>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+                     <h3 class="text-xl font-semibold mb-4">My Followers & Following</h3>
+                     <div class="flex gap-4">
+                        <button id="view-followers-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md">View Followers</button>
+                        <button id="view-following-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md">View Following</button>
+                     </div>
+                     <div id="follow-list" class="mt-4"></div>
+                 </div>
+            </section>
+
+            <!-- Posts Section -->
+            <section id="posts" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Posts Feed</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Create New Post</h3>
+                    <form id="create-post-form" class="space-y-4">
+                        <textarea id="post-content" placeholder="What's on your mind?" class="w-full p-2 border rounded-md" required></textarea>
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">Post</button>
+                    </form>
+                </div>
+                <div class="flex gap-4 mb-4">
+                    <button id="fetch-recent-posts-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md">Recent Posts</button>
+                    <button id="fetch-trending-posts-btn" class="bg-green-500 text-white px-4 py-2 rounded-md">Trending Posts</button>
+                </div>
+                <div id="posts-container" class="space-y-6"></div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Environmental Reports</h2>
+                 <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Create New Report</h3>
+                    <form id="create-report-form" class="space-y-4">
+                        <input type="text" id="report-title" placeholder="Title" class="w-full p-2 border rounded-md">
+                        <select id="report-category" class="w-full p-2 border rounded-md"></select>
+                        <input type="text" id="report-location" placeholder="Location (e.g., city, park)" class="w-full p-2 border rounded-md">
+                        <textarea id="report-description" placeholder="Describe the issue..." class="w-full p-2 border rounded-md"></textarea>
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md">Submit Report</button>
+                    </form>
+                </div>
+                 <button id="fetch-reports-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4">Fetch All Reports</button>
+                 <div id="reports-container" class="space-y-6"></div>
+            </section>
+
+            <!-- Bills Section -->
+            <section id="bills" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Bills & Usage Tracking</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Manual Bill Entry</h3>
+                        <form id="manual-bill-form" class="space-y-4">
+                            <select id="bill-type" class="w-full p-2 border rounded-md"></select>
+                            <input type="number" step="0.01" id="bill-usage" placeholder="Usage Amount" class="w-full p-2 border rounded-md" required>
+                            <input type="text" id="bill-unit" placeholder="Usage Unit (e.g., kWh)" class="w-full p-2 border rounded-md" required>
+                            <input type="number" step="0.01" id="bill-cost" placeholder="Total Cost" class="w-full p-2 border rounded-md" required>
+                            <input type="text" id="bill-period" placeholder="Billing Period (e.g., Aug 2025)" class="w-full p-2 border rounded-md" required>
+                            <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md">Record Bill</button>
+                        </form>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                         <h3 class="text-xl font-semibold mb-4">Usage Analytics</h3>
+                         <button id="fetch-analytics-btn" class="bg-green-500 text-white px-4 py-2 rounded-md">Fetch My Analytics</button>
+                         <div id="analytics-container" class="mt-4"></div>
+                     </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+                    <h3 class="text-xl font-semibold mb-4">My Bill History</h3>
+                    <button id="fetch-bills-history-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md">Fetch History</button>
+                    <div id="bills-history-container" class="mt-4"></div>
+                </div>
+            </section>
+            
+            <!-- Rewards Section -->
+            <section id="rewards" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Rewards & Achievements</h2>
+                <button id="fetch-rewards-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4">View Available Rewards</button>
+                 <div id="rewards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+            
+            <!-- Leaderboard Section -->
+            <section id="leaderboard" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Leaderboard</h2>
+                <div class="flex gap-4 mb-4">
+                     <button id="fetch-global-leaderboard-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md">Global Leaderboard</button>
+                     <button id="fetch-friends-leaderboard-btn" class="bg-green-500 text-white px-4 py-2 rounded-md">Friends Leaderboard</button>
+                </div>
+                <div id="leaderboard-container" class="bg-white p-6 rounded-lg shadow-md"></div>
+            </section>
+
+            <!-- Notifications Section -->
+            <section id="notifications" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Notifications</h2>
+                 <button id="fetch-notifications-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4">Fetch Notifications</button>
+                 <div id="notifications-container" class="space-y-4"></div>
+            </section>
+
+            <!-- Admin Section -->
+            <section id="admin" class="content-section">
+                <h2 class="text-3xl font-bold mb-6">Admin Panel</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Create Reward</h3>
+                         <form id="create-reward-form" class="space-y-4">
+                            <input type="text" id="reward-title" placeholder="Title" class="w-full p-2 border rounded-md" required>
+                            <input type="text" id="reward-description" placeholder="Description" class="w-full p-2 border rounded-md" required>
+                            <input type="number" id="reward-points" placeholder="Points Required" class="w-full p-2 border rounded-md" required>
+                             <input type="text" id="reward-badge" placeholder="Badge Name (optional)" class="w-full p-2 border rounded-md">
+                             <input type="text" id="reward-task-type" placeholder="Task Type (e.g., posts_created)" class="w-full p-2 border rounded-md" required>
+                             <input type="number" id="reward-task-count" placeholder="Task Count" class="w-full p-2 border rounded-md" value="1">
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md">Create Reward</button>
+                        </form>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                         <h3 class="text-xl font-semibold mb-4">Platform Stats</h3>
+                         <button id="fetch-admin-stats-btn" class="bg-green-500 text-white px-4 py-2 rounded-md">Fetch Stats</button>
+                         <div id="admin-stats-container" class="mt-4"></div>
+                     </div>
+                </div>
+            </section>
+
+
+            <!-- API Response Viewer -->
+            <div class="fixed bottom-0 right-0 w-1/3 bg-gray-900 text-white p-4 rounded-tl-lg shadow-2xl max-h-96 overflow-y-auto z-10">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-semibold">API Response</h3>
+                    <button id="clear-response-btn" class="text-xs bg-gray-700 px-2 py-1 rounded hover:bg-gray-600">Clear</button>
+                </div>
+                <pre id="api-response" class="text-xs whitespace-pre-wrap break-all"></pre>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Globals ---
+            const API_BASE_URL = 'http://127.0.0.1:5001';
+            let jwtToken = localStorage.getItem('jwtToken');
+            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            // --- UI Elements ---
+            const sections = document.querySelectorAll('.content-section');
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const loader = document.getElementById('loader');
+            const apiResponseEl = document.getElementById('api-response');
+            const userStatusEl = document.getElementById('user-status');
+            const logoutButton = document.getElementById('logout-button');
+
+            // --- Helper Functions ---
+            const showLoader = () => loader.classList.remove('hidden');
+            const hideLoader = () => loader.classList.add('hidden');
+
+            const showResponse = (data) => {
+                apiResponseEl.textContent = JSON.stringify(data, null, 2);
+            };
+
+            const clearResponse = () => {
+                apiResponseEl.textContent = '';
+            }
+            document.getElementById('clear-response-btn').addEventListener('click', clearResponse);
+
+            const updateLoginStatus = () => {
+                if (jwtToken && currentUser) {
+                    userStatusEl.innerHTML = `Logged in as:<br><span class="font-mono text-xs">${currentUser.email}</span>`;
+                    logoutButton.classList.remove('hidden');
+                } else {
+                    userStatusEl.textContent = 'Logged out';
+                    logoutButton.classList.add('hidden');
+                }
+            };
+
+            // --- API Fetch Wrapper ---
+            const apiFetch = async (endpoint, options = {}) => {
+                showLoader();
+                try {
+                    const headers = { 'Content-Type': 'application/json', ...options.headers };
+                    if (jwtToken) {
+                        headers['Authorization'] = `Bearer ${jwtToken}`;
+                    }
+
+                    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                        ...options,
+                        headers,
+                    });
+
+                    const data = await response.json();
+                    showResponse({ status: response.status, body: data });
+
+                    if (!response.ok) {
+                        console.error('API Error:', data);
+                        alert(`Error: ${data.error || data.message || 'Unknown error'}`);
+                    }
+                    return data;
+                } catch (error) {
+                    console.error('Fetch Error:', error);
+                    showResponse({ error: error.message });
+                    alert('An error occurred. Check the console.');
+                    return null;
+                } finally {
+                    hideLoader();
+                }
+            };
+
+            // --- Navigation ---
+            const showSection = (hash) => {
+                const id = hash.substring(1);
+                sections.forEach(section => {
+                    section.classList.toggle('active', section.id === id);
+                });
+                sidebarLinks.forEach(link => {
+                    link.classList.toggle('active', link.hash === hash);
+                });
+                // Auto-fetch data for certain sections when navigated to
+                if (jwtToken) {
+                     switch(id) {
+                        case 'profile': getProfile(); break;
+                        case 'posts': document.getElementById('fetch-recent-posts-btn').click(); break;
+                     }
+                }
+            };
+
+            window.addEventListener('hashchange', () => showSection(window.location.hash));
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.hash = link.hash;
+                });
+            });
+
+
+            // --- Authentication ---
+            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('register-name').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const data = await apiFetch('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ name, email, password }),
+                });
+                if (data && data.success) {
+                    alert('Registration successful! You can now log in.');
+                    e.target.reset();
+                }
+            });
+
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const data = await apiFetch('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password }),
+                });
+                if (data && data.success) {
+                    jwtToken = data.access_token;
+                    currentUser = data.user;
+                    localStorage.setItem('jwtToken', jwtToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    updateLoginStatus();
+                    alert('Login successful!');
+                    window.location.hash = '#profile';
+                }
+            });
+
+            logoutButton.addEventListener('click', () => {
+                jwtToken = null;
+                currentUser = null;
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('currentUser');
+                updateLoginStatus();
+                alert('Logged out.');
+                window.location.hash = '#auth';
+            });
+            
+            // --- Profile ---
+            const getProfile = async () => {
+                if (!jwtToken) return;
+                const data = await apiFetch('/auth/profile');
+                const container = document.getElementById('profile-details');
+                if (data && data.success) {
+                    container.innerHTML = `
+                        <p><strong>User ID:</strong> <span class="font-mono text-sm">${data.user_id}</span></p>
+                        <p><strong>Name:</strong> ${data.name}</p>
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <p><strong>Points:</strong> ${data.points}</p>
+                        <p><strong>Level:</strong> ${data.level}</p>
+                        <p><strong>Badges:</strong> ${data.badges.join(', ') || 'None'}</p>
+                        <p><strong>Carbon Saved:</strong> ${data.carbon_footprint_saved} kg CO2</p>
+                        <p><strong>Followers:</strong> ${data.followers_count}</p>
+                        <p><strong>Following:</strong> ${data.following_count}</p>
+                    `;
+                } else {
+                    container.innerHTML = `<p class="text-red-500">Could not fetch profile.</p>`
+                }
+            }
+
+            // --- Users & Social ---
+            document.getElementById('search-users-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const query = document.getElementById('search-query').value;
+                const data = await apiFetch(`/users/search?q=${encodeURIComponent(query)}`);
+                const container = document.getElementById('search-results');
+                if (data && data.success) {
+                    if (data.users.length === 0) {
+                        container.innerHTML = `<p>No users found.</p>`;
+                        return;
+                    }
+                    container.innerHTML = data.users.map(u => `
+                        <div class="p-2 border-b flex justify-between items-center">
+                            <div>
+                                <p>${u.name} (Level ${u.level})</p>
+                                <p class="text-xs text-gray-500 font-mono">${u.user_id}</p>
+                            </div>
+                            <button class="follow-btn bg-blue-500 text-white px-3 py-1 rounded-md text-sm" data-user-id="${u.user_id}">Follow</button>
+                        </div>
+                    `).join('');
+                }
+            });
+
+            document.addEventListener('click', e => {
+                if (e.target.classList.contains('follow-btn')) {
+                    const userId = e.target.dataset.userId;
+                    followUser(userId, e.target);
+                }
+            });
+
+            const followUser = async (userId, button) => {
+                const data = await apiFetch(`/users/${userId}/follow`, { method: 'POST' });
+                if(data && data.success) {
+                    alert(data.message);
+                    button.textContent = data.message.includes('unfollowed') ? 'Follow' : 'Unfollow';
+                }
+            }
+
+            const fetchFollowList = async (type) => { // type is 'followers' or 'following'
+                 if (!currentUser) return;
+                 const data = await apiFetch(`/users/${currentUser.user_id}/${type}`);
+                 const container = document.getElementById('follow-list');
+                 if (data && data.success) {
+                     const list = data[type];
+                     if (list.length === 0) {
+                         container.innerHTML = `<p>No ${type} found.</p>`;
+                         return;
+                     }
+                     container.innerHTML = `
+                        <h4 class="font-semibold capitalize">${type} (${data.count})</h4>
+                        ${list.map(u => `<div class="p-2 border-b">${u.name}</div>`).join('')}
+                     `;
+                 }
+            }
+             document.getElementById('view-followers-btn').addEventListener('click', () => fetchFollowList('followers'));
+             document.getElementById('view-following-btn').addEventListener('click', () => fetchFollowList('following'));
+
+            // --- Posts ---
+            document.getElementById('create-post-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const content = document.getElementById('post-content').value;
+                const data = await apiFetch('/posts', {
+                    method: 'POST',
+                    body: JSON.stringify({ content })
+                });
+                if(data && data.success) {
+                    alert('Post created!');
+                    e.target.reset();
+                    document.getElementById('fetch-recent-posts-btn').click();
+                }
+            });
+
+            const fetchPosts = async (sort) => {
+                 const data = await apiFetch(`/posts?sort=${sort}`);
+                 const container = document.getElementById('posts-container');
+                 if (data && data.success) {
+                    if (data.posts.length === 0) {
+                        container.innerHTML = `<p>No posts found.</p>`;
+                        return;
+                    }
+                    container.innerHTML = data.posts.map(p => `
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <div class="font-semibold">${p.user.name} <span class="text-sm text-gray-500 font-normal">@${p.user.user_id.slice(0,8)}</span></div>
+                            <p class="my-2">${p.content}</p>
+                            <div class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</div>
+                            <div class="flex items-center gap-4 mt-2">
+                                <button class="like-post-btn" data-post-id="${p.post_id}">❤️ <span id="likes-count-${p.post_id}">${p.likes_count}</span></button>
+                                <button class="comment-post-btn" data-post-id="${p.post_id}">💬 <span id="comments-count-${p.post_id}">${p.comments_count}</span></button>
+                                ${currentUser && p.user.user_id === currentUser.user_id ? `<button class="delete-post-btn text-red-500" data-post-id="${p.post_id}">Delete</button>` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                 }
+            };
+            document.getElementById('fetch-recent-posts-btn').addEventListener('click', () => fetchPosts('recent'));
+            document.getElementById('fetch-trending-posts-btn').addEventListener('click', () => fetchPosts('trending'));
+            
+            document.addEventListener('click', async e => {
+                if (e.target.classList.contains('like-post-btn')) {
+                    const postId = e.target.dataset.postId;
+                    const data = await apiFetch(`/posts/${postId}/like`, { method: 'POST' });
+                    if(data && data.success) {
+                        document.getElementById(`likes-count-${postId}`).textContent = data.likes_count;
+                    }
+                }
+                if (e.target.classList.contains('comment-post-btn')) {
+                    const postId = e.target.dataset.postId;
+                    const text = prompt('Enter your comment:');
+                    if (text) {
+                        const data = await apiFetch(`/posts/${postId}/comment`, { method: 'POST', body: JSON.stringify({text}) });
+                         if(data && data.success) alert('Comment added!');
+                    }
+                }
+                if (e.target.classList.contains('delete-post-btn')) {
+                     const postId = e.target.dataset.postId;
+                     if(confirm('Are you sure you want to delete this post?')) {
+                        const data = await apiFetch(`/posts/${postId}`, { method: 'DELETE' });
+                        if(data && data.success) {
+                            alert('Post deleted.');
+                            e.target.closest('.bg-white').remove();
+                        }
+                     }
+                }
+            });
+
+            // --- Reports ---
+            const fetchReportCategories = async () => {
+                const data = await apiFetch('/reports/categories');
+                const select = document.getElementById('report-category');
+                if (data && data.success) {
+                    select.innerHTML = data.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+                }
+            };
+
+            document.getElementById('create-report-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const report = {
+                    title: document.getElementById('report-title').value,
+                    category: document.getElementById('report-category').value,
+                    location: document.getElementById('report-location').value,
+                    description: document.getElementById('report-description').value,
+                };
+                 const data = await apiFetch('/reports', { method: 'POST', body: JSON.stringify(report) });
+                 if(data && data.success) {
+                    alert('Report created!');
+                    e.target.reset();
+                    document.getElementById('fetch-reports-btn').click();
+                 }
+            });
+
+            document.getElementById('fetch-reports-btn').addEventListener('click', async () => {
+                const data = await apiFetch('/reports');
+                const container = document.getElementById('reports-container');
+                if (data && data.success) {
+                    if (data.reports.length === 0) {
+                         container.innerHTML = '<p>No reports found.</p>';
+                         return;
+                    }
+                    container.innerHTML = data.reports.map(r => `
+                        <div class="bg-white p-4 rounded-lg shadow">
+                             <h4 class="font-bold text-lg">${r.title}</h4>
+                             <p class="text-sm bg-indigo-100 text-indigo-700 inline-block px-2 py-0.5 rounded-full">${r.category}</p>
+                             <p class="text-gray-600 mt-1">${r.location}</p>
+                             <p class="my-2">${r.description}</p>
+                             <div class="text-xs text-gray-500">By ${r.user.name} on ${new Date(r.created_at).toLocaleDateString()}</div>
+                             <div class="flex items-center gap-4 mt-2">
+                                <button class="like-report-btn" data-report-id="${r.report_id}">👍 <span id="report-likes-${r.report_id}">${r.likes_count}</span></button>
+                                <button class="verify-report-btn" data-report-id="${r.report_id}">✅ <span id="report-verifs-${r.report_id}">${r.verification_count}</span></button>
+                             </div>
+                        </div>
+                    `).join('');
+                }
+            });
+            
+             document.addEventListener('click', async e => {
+                const reportBtn = e.target.closest('.like-report-btn, .verify-report-btn');
+                if(!reportBtn) return;
+
+                const reportId = reportBtn.dataset.reportId;
+                const isLike = reportBtn.classList.contains('like-report-btn');
+                const endpoint = isLike ? `/reports/${reportId}/like` : `/reports/${reportId}/verify`;
+                const data = await apiFetch(endpoint, { method: 'POST' });
+
+                if (data && data.success) {
+                    if(isLike) {
+                        document.getElementById(`report-likes-${reportId}`).textContent = data.likes_count;
+                    } else {
+                        document.getElementById(`report-verifs-${reportId}`).textContent = data.verification_count;
+                    }
+                }
+             });
+
+
+            // --- Bills ---
+             const fetchBillTypes = async () => {
+                const data = await apiFetch('/bills/types');
+                const select = document.getElementById('bill-type');
+                if (data && data.success) {
+                    select.innerHTML = Object.keys(data.bill_types).map(c => `<option value="${c}">${c.charAt(0).toUpperCase() + c.slice(1)}</option>`).join('');
+                }
+            };
+            
+            document.getElementById('manual-bill-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const bill = {
+                    type: document.getElementById('bill-type').value,
+                    usage_amount: parseFloat(document.getElementById('bill-usage').value),
+                    usage_unit: document.getElementById('bill-unit').value,
+                    cost: parseFloat(document.getElementById('bill-cost').value),
+                    billing_period: document.getElementById('bill-period').value
+                };
+                const data = await apiFetch('/bills/manual-entry', { method: 'POST', body: JSON.stringify(bill) });
+                if(data && data.success) {
+                    alert('Bill recorded!');
+                    e.target.reset();
+                }
+            });
+
+            document.getElementById('fetch-bills-history-btn').addEventListener('click', async () => {
+                if(!currentUser) return;
+                const data = await apiFetch(`/bills/history/${currentUser.user_id}`);
+                const container = document.getElementById('bills-history-container');
+                if (data && data.success) {
+                     if (data.bills.length === 0) {
+                         container.innerHTML = '<p>No bill history found.</p>';
+                         return;
+                    }
+                    container.innerHTML = `
+                        <div class="grid grid-cols-5 font-bold p-2 bg-gray-200 rounded-t-md">
+                            <span>Type</span><span>Period</span><span>Usage</span><span>Cost</span><span>Date</span>
+                        </div>
+                        ${data.bills.map(b => `
+                             <div class="grid grid-cols-5 p-2 border-b">
+                                 <span>${b.type}</span>
+                                 <span>${b.billing_period}</span>
+                                 <span>${b.usage_amount} ${b.usage_unit}</span>
+                                 <span>$${b.cost.toFixed(2)}</span>
+                                 <span>${new Date(b.created_at).toLocaleDateString()}</span>
+                             </div>
+                        `).join('')}
+                    `;
+                }
+            });
+            
+            document.getElementById('fetch-analytics-btn').addEventListener('click', async () => {
+                 if(!currentUser) return;
+                const data = await apiFetch(`/bills/analytics/${currentUser.user_id}`);
+                const container = document.getElementById('analytics-container');
+                if(data && data.success) {
+                    container.innerHTML = `<pre class="text-xs bg-gray-100 p-2 rounded">${JSON.stringify(data.analytics, null, 2)}</pre>`;
+                }
+            });
+
+            // --- Rewards ---
+            document.getElementById('fetch-rewards-btn').addEventListener('click', async () => {
+                const data = await apiFetch('/rewards');
+                const container = document.getElementById('rewards-container');
+                if (data && data.success) {
+                    container.innerHTML = data.rewards.map(r => `
+                        <div class="bg-white p-4 rounded-lg shadow flex flex-col">
+                            <h4 class="font-bold text-lg">${r.title}</h4>
+                            <p class="text-sm text-gray-600 flex-grow">${r.description}</p>
+                            <div class="mt-4">
+                                <p><strong>Points:</strong> ${r.points_required}</p>
+                                ${r.badge_name ? `<p><strong>Badge:</strong> ${r.badge_name}</p>`: ''}
+                                <p class="text-xs mt-1"><strong>Task:</strong> ${r.task_type} (${r.task_count})</p>
+                            </div>
+                            <button 
+                                class="claim-reward-btn mt-4 w-full py-2 rounded-md text-white ${r.already_claimed ? 'bg-gray-400' : (r.eligible ? 'bg-green-600' : 'bg-yellow-500')}"
+                                data-reward-id="${r.reward_id}" 
+                                ${r.already_claimed || !r.eligible ? 'disabled' : ''}>
+                                ${r.already_claimed ? 'Claimed' : (r.eligible ? 'Claim' : 'Not Eligible')}
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            });
+
+            document.addEventListener('click', async e => {
+                if (e.target.classList.contains('claim-reward-btn')) {
+                    const rewardId = e.target.dataset.rewardId;
+                    const data = await apiFetch(`/rewards/claim/${rewardId}`, { method: 'POST' });
+                    if(data && data.success) {
+                        alert('Reward claimed!');
+                        document.getElementById('fetch-rewards-btn').click(); // Refresh list
+                    }
+                }
+            });
+
+            // --- Leaderboard ---
+            const fetchLeaderboard = async (type) => { // 'global' or 'friends'
+                const endpoint = type === 'global' ? '/leaderboard/global' : `/leaderboard/friends/${currentUser.user_id}`;
+                const data = await apiFetch(endpoint);
+                const container = document.getElementById('leaderboard-container');
+                if (data && data.success) {
+                     container.innerHTML = `
+                        <h3 class="text-xl font-semibold mb-2 capitalize">${type} Leaderboard</h3>
+                        ${data.leaderboard.map(u => `
+                            <div class="p-2 border-b flex justify-between">
+                                <span><strong>${u.rank}.</strong> ${u.name}</span>
+                                <span>${u.points} Points</span>
+                            </div>
+                        `).join('')}
+                     `;
+                }
+            };
+            document.getElementById('fetch-global-leaderboard-btn').addEventListener('click', () => fetchLeaderboard('global'));
+            document.getElementById('fetch-friends-leaderboard-btn').addEventListener('click', () => fetchLeaderboard('friends'));
+            
+            // --- Notifications ---
+            document.getElementById('fetch-notifications-btn').addEventListener('click', async () => {
+                if (!currentUser) return;
+                const data = await apiFetch(`/notifications/${currentUser.user_id}`);
+                const container = document.getElementById('notifications-container');
+                if (data && data.success) {
+                    container.innerHTML = `
+                        <p class="mb-2"><strong>Unread:</strong> ${data.unread_count}</p>
+                        ${data.notifications.map(n => `
+                            <div class="p-3 rounded-md ${n.is_read ? 'bg-gray-200' : 'bg-blue-100'}">
+                                <p class="font-semibold">${n.title}</p>
+                                <p>${n.message}</p>
+                                <p class="text-xs text-gray-500">${new Date(n.created_at).toLocaleString()}</p>
+                            </div>
+                        `).join('')}
+                    `;
+                }
+            });
+            
+            // --- Admin ---
+            document.getElementById('create-reward-form').addEventListener('submit', async e => {
+                 e.preventDefault();
+                 const reward = {
+                    title: document.getElementById('reward-title').value,
+                    description: document.getElementById('reward-description').value,
+                    points_required: parseInt(document.getElementById('reward-points').value),
+                    badge_name: document.getElementById('reward-badge').value,
+                    task_type: document.getElementById('reward-task-type').value,
+                    task_count: parseInt(document.getElementById('reward-task-count').value),
+                 };
+                 const data = await apiFetch('/admin/rewards', {method: 'POST', body: JSON.stringify(reward)});
+                 if(data && data.success) {
+                    alert('Reward created!');
+                    e.target.reset();
+                 }
+            });
+
+            document.getElementById('fetch-admin-stats-btn').addEventListener('click', async() => {
+                const data = await apiFetch('/admin/stats');
+                const container = document.getElementById('admin-stats-container');
+                if(data && data.success) {
+                    container.innerHTML = `<pre class="text-xs bg-gray-100 p-2 rounded">${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            });
+
+
+            // --- Initial Load ---
+            const init = () => {
+                updateLoginStatus();
+                const hash = window.location.hash || '#auth';
+                showSection(hash);
+                fetchReportCategories();
+                fetchBillTypes();
+            };
+
+            init();
+        });
+    </script>
+</body>
+</html>

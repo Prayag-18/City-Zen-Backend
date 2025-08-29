@@ -57,14 +57,14 @@ class BaseModel:
         return list(cursor)
     
     def insert_one(self, document):
-        document['created_at'] = datetime.utcnow()
-        document['updated_at'] = datetime.utcnow()
+        document['created_at'] = datetime.now()
+        document['updated_at'] = datetime.now()
         result = self.collection.insert_one(document)
         return result.inserted_id
     
     def update_one(self, query, update):
         update['$set'] = update.get('$set', {})
-        update['$set']['updated_at'] = datetime.utcnow()
+        update['$set']['updated_at'] = datetime.now()
         return self.collection.update_one(query, update)
     
     def delete_one(self, query):
@@ -160,7 +160,7 @@ class Post(BaseModel):
             'comment_id': str(ObjectId()),
             'user_id': user_id,
             'text': comment_text,
-            'created_at': datetime.utcnow()
+            'created_at': datetime.now()
         }
         
         return self.update_one(
@@ -270,14 +270,13 @@ class Picture(BaseModel):
     
     def store_file_info(self, file_data):
         picture = {
-            'picture_id': str(ObjectId()),
             'filename': file_data['filename'],
             'file_type': file_data['file_type'],
             'file_path': file_data['file_path'],
             'user_id': file_data['user_id']
         }
-        self.insert_one(picture)
-        return picture['picture_id']
+
+        return self.insert_one(picture)
 
 # Reward Model
 class Reward(BaseModel):

@@ -53,7 +53,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 ml-64 p-8 overflow-y-auto">
+        <main class="flex-1 ml-64 p-8 overflow-y-auto pb-48">
             <div id="loader" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                 <div class="loader"></div>
             </div>
@@ -88,8 +88,18 @@
             <!-- Profile Section -->
             <section id="profile" class="content-section">
                  <h2 class="text-3xl font-bold mb-6">My Profile</h2>
-                 <div id="profile-details" class="bg-white p-6 rounded-lg shadow-md">
-                     <!-- Profile data will be injected here -->
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div id="profile-details" class="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                        <!-- Profile data will be injected here -->
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Profile Picture</h3>
+                        <img id="profile-pic-preview" src="https://placehold.co/200x200/e2e8f0/a0aec0?text=No+Image" class="w-48 h-48 rounded-full mx-auto mb-4 object-cover border-4 border-gray-200">
+                        <form id="upload-pfp-form">
+                            <input type="file" id="pfp-file-input" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
+                            <button type="submit" class="w-full mt-2 bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700">Upload</button>
+                        </form>
+                    </div>
                  </div>
             </section>
             
@@ -139,7 +149,7 @@
                     <form id="create-report-form" class="space-y-4">
                         <input type="text" id="report-title" placeholder="Title" class="w-full p-2 border rounded-md">
                         <select id="report-category" class="w-full p-2 border rounded-md"></select>
-                        <input type="text" id="report-location" placeholder="Location (e.g., city, park)" class="w-full p-2 border rounded-md">
+                        <input type="text" id="report-location" placeholder="Location (e.g., Delhi)" class="w-full p-2 border rounded-md">
                         <textarea id="report-description" placeholder="Describe the issue..." class="w-full p-2 border rounded-md"></textarea>
                         <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md">Submit Report</button>
                     </form>
@@ -226,7 +236,7 @@
 
 
             <!-- API Response Viewer -->
-            <div class="fixed bottom-0 right-0 w-1/3 bg-gray-900 text-white p-4 rounded-tl-lg shadow-2xl max-h-96 overflow-y-auto z-10">
+            <div class="fixed bottom-0 right-0 w-[400px] bg-gray-900 text-white p-4 rounded-tl-lg shadow-2xl max-h-96 overflow-y-auto z-10">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-lg font-semibold">API Response</h3>
                     <button id="clear-response-btn" class="text-xs bg-gray-700 px-2 py-1 rounded hover:bg-gray-600">Clear</button>
@@ -250,6 +260,7 @@
             const apiResponseEl = document.getElementById('api-response');
             const userStatusEl = document.getElementById('user-status');
             const logoutButton = document.getElementById('logout-button');
+            const profilePicPreview = document.getElementById('profile-pic-preview');
 
             // --- Helper Functions ---
             const showLoader = () => loader.classList.remove('hidden');
@@ -278,7 +289,9 @@
             const apiFetch = async (endpoint, options = {}) => {
                 showLoader();
                 try {
-                    const headers = { 'Content-Type': 'application/json', ...options.headers };
+                    const isFormData = options.body instanceof FormData;
+                    const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
+                    
                     if (jwtToken) {
                         headers['Authorization'] = `Bearer ${jwtToken}`;
                     }
@@ -293,13 +306,16 @@
 
                     if (!response.ok) {
                         console.error('API Error:', data);
-                        alert(`Error: ${data.error || data.message || 'Unknown error'}`);
+                        if (response.status !== 401 || endpoint.startsWith('/auth/')) {
+                           alert(`Error: ${data.error || data.message || data.msg ||'Unknown error'}`);
+                        }
                     }
                     return data;
                 } catch (error) {
                     console.error('Fetch Error:', error);
-                    showResponse({ error: error.message });
-                    alert('An error occurred. Check the console.');
+                    const errorMsg = { error: error.message };
+                    showResponse(errorMsg);
+                    alert('An error occurred. Check the console and the API Response window.');
                     return null;
                 } finally {
                     hideLoader();
@@ -315,20 +331,26 @@
                 sidebarLinks.forEach(link => {
                     link.classList.toggle('active', link.hash === hash);
                 });
-                // Auto-fetch data for certain sections when navigated to
                 if (jwtToken) {
                      switch(id) {
                         case 'profile': getProfile(); break;
                         case 'posts': document.getElementById('fetch-recent-posts-btn').click(); break;
+                        case 'reports': 
+                            document.getElementById('fetch-reports-btn').click();
+                            fetchReportCategories(); 
+                            break;
+                        case 'bills': 
+                            document.getElementById('fetch-bills-history-btn').click();
+                            fetchBillTypes(); 
+                            break;
                      }
                 }
             };
 
-            window.addEventListener('hashchange', () => showSection(window.location.hash));
             sidebarLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    window.location.hash = link.hash;
+                    showSection(link.hash);
                 });
             });
 
@@ -364,7 +386,7 @@
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
                     updateLoginStatus();
                     alert('Login successful!');
-                    window.location.hash = '#profile';
+                    showSection('#profile');
                 }
             });
 
@@ -375,7 +397,8 @@
                 localStorage.removeItem('currentUser');
                 updateLoginStatus();
                 alert('Logged out.');
-                window.location.hash = '#auth';
+                profilePicPreview.src = "https://placehold.co/200x200/e2e8f0/a0aec0?text=No+Image";
+                showSection('#auth');
             });
             
             // --- Profile ---
@@ -385,25 +408,52 @@
                 const container = document.getElementById('profile-details');
                 if (data && data.success) {
                     container.innerHTML = `
-                        <p><strong>User ID:</strong> <span class="font-mono text-sm">${data.user_id}</span></p>
-                        <p><strong>Name:</strong> ${data.name}</p>
-                        <p><strong>Email:</strong> ${data.email}</p>
-                        <p><strong>Points:</strong> ${data.points}</p>
-                        <p><strong>Level:</strong> ${data.level}</p>
-                        <p><strong>Badges:</strong> ${data.badges.join(', ') || 'None'}</p>
-                        <p><strong>Carbon Saved:</strong> ${data.carbon_footprint_saved} kg CO2</p>
-                        <p><strong>Followers:</strong> ${data.followers_count}</p>
-                        <p><strong>Following:</strong> ${data.following_count}</p>
+                        <p class="mb-2"><strong>User ID:</strong> <span class="font-mono text-sm bg-gray-100 p-1 rounded">${data.user_id}</span></p>
+                        <p class="mb-2"><strong>Name:</strong> ${data.name}</p>
+                        <p class="mb-2"><strong>Email:</strong> ${data.email}</p>
+                        <p class="mb-2"><strong>Points:</strong> <span class="font-bold text-green-600">${data.points}</span></p>
+                        <p class="mb-2"><strong>Level:</strong> <span class="font-bold text-indigo-600">${data.level}</span></p>
+                        <p class="mb-2"><strong>Badges:</strong> ${data.badges.join(', ') || 'None'}</p>
+                        <p class="mb-2"><strong>Carbon Saved:</strong> ${data.carbon_footprint_saved.toFixed(2)} kg CO2</p>
+                        <p class="mb-2"><strong>Followers:</strong> ${data.followers_count}</p>
+                        <p class="mb-2"><strong>Following:</strong> ${data.following_count}</p>
                     `;
+                    if (data.profile_picture_id) {
+                        profilePicPreview.src = `${API_BASE_URL}/media/view/${data.profile_picture_id}`;
+                    } else {
+                        profilePicPreview.src = "https://placehold.co/200x200/e2e8f0/a0aec0?text=No+Image";
+                    }
                 } else {
                     container.innerHTML = `<p class="text-red-500">Could not fetch profile.</p>`
                 }
             }
 
+            document.getElementById('upload-pfp-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const fileInput = document.getElementById('pfp-file-input');
+                if (fileInput.files.length === 0) {
+                    alert('Please select a file to upload.');
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                const data = await apiFetch('/media/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (data && data.success) {
+                    alert('Profile picture updated!');
+                    getProfile(); // Refresh profile to show new picture
+                }
+            });
+
             // --- Users & Social ---
             document.getElementById('search-users-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const query = document.getElementById('search-query').value;
+                if (!query) return;
                 const data = await apiFetch(`/users/search?q=${encodeURIComponent(query)}`);
                 const container = document.getElementById('search-results');
                 if (data && data.success) {
@@ -420,13 +470,6 @@
                             <button class="follow-btn bg-blue-500 text-white px-3 py-1 rounded-md text-sm" data-user-id="${u.user_id}">Follow</button>
                         </div>
                     `).join('');
-                }
-            });
-
-            document.addEventListener('click', e => {
-                if (e.target.classList.contains('follow-btn')) {
-                    const userId = e.target.dataset.userId;
-                    followUser(userId, e.target);
                 }
             });
 
@@ -480,50 +523,113 @@
                         container.innerHTML = `<p>No posts found.</p>`;
                         return;
                     }
-                    container.innerHTML = data.posts.map(p => `
+                    container.innerHTML = data.posts.map(p => {
+                        const avatarUrl = p.user.profile_picture_id 
+                            ? `${API_BASE_URL}/media/view/${p.user.profile_picture_id}`
+                            : `https://placehold.co/40x40/e2e8f0/a0aec0?text=${p.user.name.charAt(0)}`;
+
+                        return `
                         <div class="bg-white p-4 rounded-lg shadow">
-                            <div class="font-semibold">${p.user.name} <span class="text-sm text-gray-500 font-normal">@${p.user.user_id.slice(0,8)}</span></div>
-                            <p class="my-2">${p.content}</p>
-                            <div class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</div>
-                            <div class="flex items-center gap-4 mt-2">
-                                <button class="like-post-btn" data-post-id="${p.post_id}">❤️ <span id="likes-count-${p.post_id}">${p.likes_count}</span></button>
-                                <button class="comment-post-btn" data-post-id="${p.post_id}">💬 <span id="comments-count-${p.post_id}">${p.comments_count}</span></button>
-                                ${currentUser && p.user.user_id === currentUser.user_id ? `<button class="delete-post-btn text-red-500" data-post-id="${p.post_id}">Delete</button>` : ''}
+                            <div class="flex items-center mb-3">
+                                <img src="${avatarUrl}" class="w-10 h-10 rounded-full mr-3 object-cover border">
+                                <div>
+                                    <div class="font-semibold">${p.user.name}</div>
+                                    <div class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</div>
+                                </div>
                             </div>
+                            <p class="my-2 text-gray-800">${p.content}</p>
+                            <div class="flex items-center gap-4 mt-2 text-gray-600">
+                                <button class="like-post-btn flex items-center gap-1" data-post-id="${p.post_id}">❤️ <span id="likes-count-${p.post_id}">${p.likes_count}</span></button>
+                                <button class="comment-post-btn flex items-center gap-1" data-post-id="${p.post_id}">💬 <span id="comments-count-${p.post_id}">${p.comments_count}</span></button>
+                                ${currentUser && p.user.user_id === currentUser.user_id ? `<button class="delete-post-btn text-red-500 ml-auto" data-post-id="${p.post_id}">Delete</button>` : ''}
+                            </div>
+                            <div id="comments-section-${p.post_id}" class="hidden mt-4 pt-4 border-t"></div>
                         </div>
-                    `).join('');
+                    `}).join('');
                  }
             };
             document.getElementById('fetch-recent-posts-btn').addEventListener('click', () => fetchPosts('recent'));
             document.getElementById('fetch-trending-posts-btn').addEventListener('click', () => fetchPosts('trending'));
             
-            document.addEventListener('click', async e => {
-                if (e.target.classList.contains('like-post-btn')) {
+             const fetchComments = async (postId) => {
+                const container = document.getElementById(`comments-section-${postId}`);
+                container.innerHTML = '<p class="text-sm text-gray-500">Loading comments...</p>';
+                const data = await apiFetch(`/posts/${postId}/comments`);
+                if(data && data.success) {
+                    let commentsHTML = '<h4>Comments</h4>';
+                    if (data.comments.length > 0) {
+                        commentsHTML += data.comments.map(c => `
+                            <div class="p-2 border-b text-sm">
+                                <strong>${c.user.name}:</strong> ${c.text}
+                                <div class="text-xs text-gray-400">${new Date(c.created_at).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+                    } else {
+                        commentsHTML += '<p class="text-sm text-gray-500">No comments yet.</p>';
+                    }
+                    commentsHTML += `
+                        <form class="add-comment-form mt-2 flex gap-2" data-post-id="${postId}">
+                            <input type="text" placeholder="Add a comment..." class="flex-grow p-1 border rounded-md text-sm" required>
+                            <button type="submit" class="bg-indigo-500 text-white px-3 py-1 text-sm rounded-md">Add</button>
+                        </form>
+                    `;
+                    container.innerHTML = commentsHTML;
+                }
+             };
+            
+            document.addEventListener('submit', async e => {
+                if (e.target.classList.contains('add-comment-form')) {
+                    e.preventDefault();
                     const postId = e.target.dataset.postId;
+                    const textInput = e.target.querySelector('input');
+                    const text = textInput.value;
+                    if(text) {
+                        const data = await apiFetch(`/posts/${postId}/comment`, { method: 'POST', body: JSON.stringify({text}) });
+                        if(data && data.success) {
+                            fetchComments(postId); // Refresh comments after adding
+                            const countEl = document.getElementById(`comments-count-${postId}`);
+                            countEl.textContent = parseInt(countEl.textContent) + 1;
+                        }
+                    }
+                }
+            });
+
+            document.addEventListener('click', async e => {
+                const target = e.target;
+                if (target.closest('.like-post-btn')) {
+                    const button = target.closest('.like-post-btn');
+                    const postId = button.dataset.postId;
                     const data = await apiFetch(`/posts/${postId}/like`, { method: 'POST' });
                     if(data && data.success) {
                         document.getElementById(`likes-count-${postId}`).textContent = data.likes_count;
                     }
                 }
-                if (e.target.classList.contains('comment-post-btn')) {
-                    const postId = e.target.dataset.postId;
-                    const text = prompt('Enter your comment:');
-                    if (text) {
-                        const data = await apiFetch(`/posts/${postId}/comment`, { method: 'POST', body: JSON.stringify({text}) });
-                         if(data && data.success) alert('Comment added!');
+                if (target.closest('.comment-post-btn')) {
+                    const button = target.closest('.comment-post-btn');
+                    const postId = button.dataset.postId;
+                    const commentsSection = document.getElementById(`comments-section-${postId}`);
+                    const isHidden = commentsSection.classList.toggle('hidden');
+                    if (!isHidden && commentsSection.innerHTML.includes('Loading')) {
+                        fetchComments(postId);
                     }
                 }
-                if (e.target.classList.contains('delete-post-btn')) {
-                     const postId = e.target.dataset.postId;
+                if (target.closest('.delete-post-btn')) {
+                     const button = target.closest('.delete-post-btn');
+                     const postId = button.dataset.postId;
                      if(confirm('Are you sure you want to delete this post?')) {
                         const data = await apiFetch(`/posts/${postId}`, { method: 'DELETE' });
                         if(data && data.success) {
                             alert('Post deleted.');
-                            e.target.closest('.bg-white').remove();
+                            button.closest('.bg-white').remove();
                         }
                      }
                 }
+                 if (target.classList.contains('follow-btn')) {
+                    const userId = target.dataset.userId;
+                    followUser(userId, target);
+                }
             });
+
 
             // --- Reports ---
             const fetchReportCategories = async () => {
@@ -615,6 +721,7 @@
                 if(data && data.success) {
                     alert('Bill recorded!');
                     e.target.reset();
+                    document.getElementById('fetch-bills-history-btn').click();
                 }
             });
 
@@ -628,15 +735,15 @@
                          return;
                     }
                     container.innerHTML = `
-                        <div class="grid grid-cols-5 font-bold p-2 bg-gray-200 rounded-t-md">
+                        <div class="grid grid-cols-5 font-bold p-2 bg-gray-200 rounded-t-md text-sm">
                             <span>Type</span><span>Period</span><span>Usage</span><span>Cost</span><span>Date</span>
                         </div>
                         ${data.bills.map(b => `
-                             <div class="grid grid-cols-5 p-2 border-b">
-                                 <span>${b.type}</span>
+                             <div class="grid grid-cols-5 p-2 border-b text-sm">
+                                 <span class="capitalize">${b.type}</span>
                                  <span>${b.billing_period}</span>
                                  <span>${b.usage_amount} ${b.usage_unit}</span>
-                                 <span>$${b.cost.toFixed(2)}</span>
+                                 <span>₹${b.cost.toFixed(2)}</span>
                                  <span>${new Date(b.created_at).toLocaleDateString()}</span>
                              </div>
                         `).join('')}
@@ -668,7 +775,7 @@
                                 <p class="text-xs mt-1"><strong>Task:</strong> ${r.task_type} (${r.task_count})</p>
                             </div>
                             <button 
-                                class="claim-reward-btn mt-4 w-full py-2 rounded-md text-white ${r.already_claimed ? 'bg-gray-400' : (r.eligible ? 'bg-green-600' : 'bg-yellow-500')}"
+                                class="claim-reward-btn mt-4 w-full py-2 rounded-md text-white ${r.already_claimed ? 'bg-gray-400 cursor-not-allowed' : (r.eligible ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-500 cursor-not-allowed')}"
                                 data-reward-id="${r.reward_id}" 
                                 ${r.already_claimed || !r.eligible ? 'disabled' : ''}>
                                 ${r.already_claimed ? 'Claimed' : (r.eligible ? 'Claim' : 'Not Eligible')}
@@ -691,6 +798,10 @@
 
             // --- Leaderboard ---
             const fetchLeaderboard = async (type) => { // 'global' or 'friends'
+                if (type === 'friends' && !currentUser) {
+                    alert('You must be logged in to see the friends leaderboard.');
+                    return;
+                }
                 const endpoint = type === 'global' ? '/leaderboard/global' : `/leaderboard/friends/${currentUser.user_id}`;
                 const data = await apiFetch(endpoint);
                 const container = document.getElementById('leaderboard-container');
@@ -715,6 +826,10 @@
                 const data = await apiFetch(`/notifications/${currentUser.user_id}`);
                 const container = document.getElementById('notifications-container');
                 if (data && data.success) {
+                    if (data.notifications.length === 0) {
+                        container.innerHTML = '<p>No notifications.</p>';
+                        return;
+                    }
                     container.innerHTML = `
                         <p class="mb-2"><strong>Unread:</strong> ${data.unread_count}</p>
                         ${data.notifications.map(n => `
@@ -758,10 +873,7 @@
             // --- Initial Load ---
             const init = () => {
                 updateLoginStatus();
-                const hash = window.location.hash || '#auth';
-                showSection(hash);
-                fetchReportCategories();
-                fetchBillTypes();
+                showSection(window.location.hash || '#auth');
             };
 
             init();
@@ -769,3 +881,4 @@
     </script>
 </body>
 </html>
+

@@ -35,6 +35,7 @@ def create_app():
     from blueprints.leaderboard import leaderboard_bp
     from blueprints.notifications import notifications_bp
     from blueprints.admin import admin_bp
+    from blueprints.media import media_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(users_bp, url_prefix='/users')
@@ -45,6 +46,7 @@ def create_app():
     app.register_blueprint(leaderboard_bp, url_prefix='/leaderboard')
     app.register_blueprint(notifications_bp, url_prefix='/notifications')
     app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(media_bp, url_prefix='/media') 
     
     # Error handlers
     @app.errorhandler(HTTPException)

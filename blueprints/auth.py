@@ -1,12 +1,13 @@
 # blueprints/auth.py - Authentication endpoints
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from models.database import User
+from models.database import User,Picture
 from utils.validators import validate_email, validate_password, validate_required_fields
 from utils.responses import success_response, error_response
 
 auth_bp = Blueprint('auth', __name__)
 user_model = User()
+picture_model = Picture()
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -89,6 +90,7 @@ def login():
     except Exception as e:
         return error_response(f'Login failed: {str(e)}', 500)
 
+
 @auth_bp.route('/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
@@ -99,6 +101,14 @@ def get_profile():
         if not user:
             return error_response('User not found', 404)
         
+        # Get profile picture URL
+        profile_picture_url = None
+        if user.get('profile_picture_id'):
+            picture = picture_model.find_one({'picture_id': user['profile_picture_id']})
+            if picture:
+                # Construct full URL
+                profile_picture_url = f"{request.host_url}uploads/{picture['file_path'].replace('uploads/', '', 1)}"
+
         # Remove sensitive information
         user_data = {
             'user_id': user['user_id'],
@@ -109,6 +119,7 @@ def get_profile():
             'badges': user.get('badges', []),
             'carbon_footprint_saved': user.get('carbon_footprint_saved', 0),
             'profile_picture_id': user.get('profile_picture_id'),
+            'profile_picture_url': profile_picture_url, # Add URL to response
             'followers_count': len(user.get('followers', [])),
             'following_count': len(user.get('following', []))
         }
@@ -117,7 +128,6 @@ def get_profile():
         
     except Exception as e:
         return error_response(f'Failed to get profile: {str(e)}', 500)
-
 @auth_bp.route('/refresh', methods=['POST'])
 @jwt_required()
 def refresh_token():

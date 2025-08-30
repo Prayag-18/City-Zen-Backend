@@ -36,6 +36,7 @@ def create_app():
     from blueprints.notifications import notifications_bp
     from blueprints.admin import admin_bp
     from blueprints.media import media_bp
+    from blueprints.uploads import uploads_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(users_bp, url_prefix='/users')
@@ -47,7 +48,7 @@ def create_app():
     app.register_blueprint(notifications_bp, url_prefix='/notifications')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(media_bp, url_prefix='/media') 
-    
+    app.register_blueprint(uploads_bp, url_prefix='/uploads')
     # Error handlers
     @app.errorhandler(HTTPException)
     def handle_exception(e):

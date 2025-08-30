@@ -21,7 +21,6 @@ def create_report():
         
         data = request.get_json()
         
-        # All fields are optional except user_id (which we get from token)
         report_data = {
             'user_id': current_user['user_id'],
             'title': data.get('title', ''),
@@ -33,13 +32,11 @@ def create_report():
         
         report_id = report_model.create_report(report_data)
         
-        # Award points for creating a report
         user_model.add_points(current_user['user_id'], 20)
         
-        # Update carbon footprint contribution
         user_model.update_one(
             {'user_id': current_user['user_id']},
-            {'$inc': {'carbon_footprint_saved': 5.0}}  # 5kg CO2 saved for reporting
+            {'$inc': {'carbon_footprint_saved': 5.0}}
         )
         
         return success_response({

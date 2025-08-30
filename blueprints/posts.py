@@ -30,7 +30,7 @@ def create_post():
         post_data = {
             'user_id': current_user['user_id'],
             'content': data['content'],
-            'media_id': data.get('media_id')
+            'media_id': data.get('media_id') 
         }
         
         post_id = post_model.create_post(post_data)

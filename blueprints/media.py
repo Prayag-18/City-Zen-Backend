@@ -42,11 +42,14 @@ def upload_media():
             'user_id': current_user['user_id']
         })
         
-        # Also update the user's profile_picture_id
-        user_model.update_one(
-            {'user_id': current_user['user_id']},
-            {'$set': {'profile_picture_id': str(picture_id)}}
-        )
+        # --- MODIFIED: Only update profile picture if specified ---
+        upload_type = request.form.get('upload_type')
+        if upload_type == 'profile':
+            user_model.update_one(
+                {'user_id': current_user['user_id']},
+                {'$set': {'profile_picture_id': str(picture_id)}}
+            )
+        # ---------------------------------------------------------
 
         return success_response({
             'message': 'File uploaded successfully',
@@ -60,22 +63,16 @@ def upload_media():
 @media_bp.route('/view/<picture_id>')
 def view_media(picture_id):
     try:
-        # Convert string ID from URL to a proper ObjectId
         obj_id = ObjectId(picture_id)
-
-        # Find the picture's metadata in the database
         picture_info = picture_model.find_one({'_id': obj_id})
 
         if not picture_info:
             return error_response('File not found in database', 404)
         
         file_path = picture_info.get('file_path')
-
-        # Check if the file exists on the server's disk
         if not file_path or not os.path.exists(file_path):
              return error_response('File not found on server disk', 404)
 
-        # --- CHANGED: Use absolute path for robustness ---
         directory, filename = os.path.split(file_path)
         abs_directory = os.path.abspath(directory)
         

@@ -83,8 +83,7 @@
             <section id="profile" class="content-section">
                  <h2 class="text-3xl font-bold mb-6">My Profile</h2>
                  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div id="profile-details" class="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                        </div>
+                    <div id="profile-details" class="md:col-span-2 bg-white p-6 rounded-lg shadow-md"></div>
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-xl font-semibold mb-4">Profile Picture</h3>
                         <img id="profile-pic-preview" src="https://placehold.co/200x200/e2e8f0/a0aec0?text=No+Image" class="w-48 h-48 rounded-full mx-auto mb-4 object-cover border-4 border-gray-200">
@@ -122,6 +121,7 @@
                     <h3 class="text-xl font-semibold mb-4">Create New Post</h3>
                     <form id="create-post-form" class="space-y-4">
                         <textarea id="post-content" placeholder="What's on your mind?" class="w-full p-2 border rounded-md" required></textarea>
+                        <input type="file" id="post-media-input" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100", accept="image/*,video/*">
                         <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">Post</button>
                     </form>
                 </div>
@@ -141,6 +141,7 @@
                         <select id="report-category" class="w-full p-2 border rounded-md"></select>
                         <input type="text" id="report-location" placeholder="Location (e.g., Delhi)" class="w-full p-2 border rounded-md">
                         <textarea id="report-description" placeholder="Describe the issue..." class="w-full p-2 border rounded-md"></textarea>
+                        <input type="file" id="report-evidence-input" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100", accept="image/*,video/*">
                         <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md">Submit Report</button>
                     </form>
                 </div>
@@ -219,7 +220,6 @@
                 </div>
             </section>
 
-
             <div class="fixed bottom-0 right-0 w-[400px] bg-gray-900 text-white p-4 rounded-tl-lg shadow-2xl max-h-96 overflow-y-auto z-10">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-lg font-semibold">API Response</h3>
@@ -232,11 +232,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Globals & UI Elements ---
-            // ... (same as before) ...
             const API_BASE_URL = 'http://127.0.0.1:5001';
             let jwtToken = localStorage.getItem('jwtToken');
             let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
             const sections = document.querySelectorAll('.content-section');
             const sidebarLinks = document.querySelectorAll('.sidebar-link');
             const loader = document.getElementById('loader');
@@ -245,14 +244,16 @@
             const logoutButton = document.getElementById('logout-button');
             const profilePicPreview = document.getElementById('profile-pic-preview');
 
-            // --- Helper Functions ---
             const showLoader = () => loader.classList.remove('hidden');
             const hideLoader = () => loader.classList.add('hidden');
+
             const showResponse = (data) => {
                 apiResponseEl.textContent = JSON.stringify(data, null, 2);
             };
+
             const clearResponse = () => { apiResponseEl.textContent = ''; }
             document.getElementById('clear-response-btn').addEventListener('click', clearResponse);
+
             const updateLoginStatus = () => {
                 if (jwtToken && currentUser) {
                     userStatusEl.innerHTML = `Logged in as:<br><span class="font-mono text-xs">${currentUser.email}</span>`;
@@ -263,7 +264,6 @@
                 }
             };
 
-            // --- API Fetch Wrapper ---
             const apiFetch = async (endpoint, options = {}) => {
                 showLoader();
                 try {
@@ -298,7 +298,6 @@
                 }
             };
 
-            // --- Navigation ---
             const showSection = (hash) => {
                 const id = hash.substring(1);
                 sections.forEach(section => section.classList.toggle('active', section.id === id));
@@ -325,8 +324,7 @@
                     showSection(link.hash);
                 });
             });
-
-            // --- Authentication ---
+            
             document.getElementById('register-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('register-name').value;
@@ -365,7 +363,6 @@
                 showSection('#auth');
             });
             
-            // --- Profile & Media ---
             const getProfile = async () => {
                 if (!jwtToken) return;
                 const data = await apiFetch('/auth/profile');
@@ -388,6 +385,8 @@
                 if (fileInput.files.length === 0) return alert('Please select a file.');
                 const formData = new FormData();
                 formData.append('file', fileInput.files[0]);
+                // --- MODIFIED: Specify upload type for profile pictures ---
+                formData.append('upload_type', 'profile'); 
                 const data = await apiFetch('/media/upload', { method: 'POST', body: formData });
                 if (data && data.success) {
                     alert('Profile picture updated!');
@@ -395,7 +394,6 @@
                 }
             });
 
-            // --- Users & Social ---
             document.getElementById('search-users-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const query = document.getElementById('search-query').value;
@@ -406,6 +404,7 @@
                     container.innerHTML = data.users.length ? data.users.map(u => `<div class="p-2 border-b flex justify-between items-center"><div><p>${u.name} (Level ${u.level})</p><p class="text-xs text-gray-500 font-mono">${u.user_id}</p></div><button class="follow-btn bg-blue-500 text-white px-3 py-1 rounded-md text-sm" data-user-id="${u.user_id}">Follow</button></div>`).join('') : `<p>No users found.</p>`;
                 }
             });
+
             const followUser = async (userId, button) => {
                 const data = await apiFetch(`/users/${userId}/follow`, { method: 'POST' });
                 if(data && data.success) {
@@ -425,24 +424,35 @@
             document.getElementById('view-followers-btn').addEventListener('click', () => fetchFollowList('followers'));
             document.getElementById('view-following-btn').addEventListener('click', () => fetchFollowList('following'));
 
-            // --- Posts ---
             document.getElementById('create-post-form').addEventListener('submit', async e => {
                 e.preventDefault();
                 const content = document.getElementById('post-content').value;
-                const data = await apiFetch('/posts', { method: 'POST', body: JSON.stringify({ content }) });
+                const mediaInput = document.getElementById('post-media-input');
+                let mediaId = null;
+                if (mediaInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('file', mediaInput.files[0]);
+                    const uploadData = await apiFetch('/media/upload', { method: 'POST', body: formData });
+                    if (uploadData && uploadData.success) { mediaId = uploadData.picture_id; } 
+                    else { return alert('Image upload failed. Post not created.'); }
+                }
+                const postData = { content, media_id: mediaId };
+                const data = await apiFetch('/posts', { method: 'POST', body: JSON.stringify(postData) });
                 if(data && data.success) {
                     alert('Post created!');
                     e.target.reset();
                     document.getElementById('fetch-recent-posts-btn').click();
                 }
             });
+
             const fetchPosts = async (sort) => {
                  const data = await apiFetch(`/posts?sort=${sort}`);
                  const container = document.getElementById('posts-container');
                  if (data && data.success) {
                     container.innerHTML = data.posts.length ? data.posts.map(p => {
                         const avatarUrl = p.user.profile_picture_id ? `${API_BASE_URL}/media/view/${p.user.profile_picture_id}` : `https://placehold.co/40x40/e2e8f0/a0aec0?text=${p.user.name.charAt(0)}`;
-                        return `<div class="bg-white p-4 rounded-lg shadow"><div class="flex items-center mb-3"><img src="${avatarUrl}" class="w-10 h-10 rounded-full mr-3 object-cover border"><div><div class="font-semibold">${p.user.name}</div><div class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</div></div></div><p class="my-2 text-gray-800">${p.content}</p><div class="flex items-center gap-4 mt-2 text-gray-600"><button class="like-post-btn flex items-center gap-1" data-post-id="${p.post_id}">❤️ <span id="likes-count-${p.post_id}">${p.likes_count}</span></button><button class="comment-post-btn flex items-center gap-1" data-post-id="${p.post_id}">💬 <span id="comments-count-${p.post_id}">${p.comments_count}</span></button>${currentUser && p.user.user_id === currentUser.user_id ? `<button class="delete-post-btn text-red-500 ml-auto" data-post-id="${p.post_id}">Delete</button>` : ''}</div><div id="comments-section-${p.post_id}" class="hidden mt-4 pt-4 border-t"></div></div>`
+                        const mediaHTML = p.media_id ? `<img src="${API_BASE_URL}/media/view/${p.media_id}" class="mt-3 rounded-lg w-full object-cover max-h-96">` : '';
+                        return `<div class="bg-white p-4 rounded-lg shadow"><div class="flex items-center mb-3"><img src="${avatarUrl}" class="w-10 h-10 rounded-full mr-3 object-cover border"><div><div class="font-semibold">${p.user.name}</div><div class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</div></div></div><p class="my-2 text-gray-800">${p.content}</p>${mediaHTML}<div class="flex items-center gap-4 mt-2 text-gray-600"><button class="like-post-btn flex items-center gap-1" data-post-id="${p.post_id}">❤️ <span id="likes-count-${p.post_id}">${p.likes_count}</span></button><button class="comment-post-btn flex items-center gap-1" data-post-id="${p.post_id}">💬 <span id="comments-count-${p.post_id}">${p.comments_count}</span></button>${currentUser && p.user.user_id === currentUser.user_id ? `<button class="delete-post-btn text-red-500 ml-auto" data-post-id="${p.post_id}">Delete</button>` : ''}</div><div id="comments-section-${p.post_id}" class="hidden mt-4 pt-4 border-t"></div></div>`
                     }).join('') : `<p>No posts found.</p>`;
                  }
             };
@@ -455,17 +465,12 @@
                 const data = await apiFetch(`/posts/${postId}/comments`);
                 if(data && data.success) {
                     let commentsHTML = '<h4>Comments</h4>';
-                    if (data.comments.length > 0) {
-                        commentsHTML += data.comments.map(c => `<div class="p-2 border-b text-sm"><strong>${c.user.name}:</strong> ${c.text}<div class="text-xs text-gray-400">${new Date(c.created_at).toLocaleString()}</div></div>`).join('');
-                    } else {
-                        commentsHTML += '<p class="text-sm text-gray-500">No comments yet.</p>';
-                    }
+                    commentsHTML += data.comments.length ? data.comments.map(c => `<div class="p-2 border-b text-sm"><strong>${c.user.name}:</strong> ${c.text}<div class="text-xs text-gray-400">${new Date(c.created_at).toLocaleString()}</div></div>`).join('') : '<p class="text-sm text-gray-500">No comments yet.</p>';
                     commentsHTML += `<form class="add-comment-form mt-2 flex gap-2" data-post-id="${postId}"><input type="text" placeholder="Add a comment..." class="flex-grow p-1 border rounded-md text-sm" required><button type="submit" class="bg-indigo-500 text-white px-3 py-1 text-sm rounded-md">Add</button></form>`;
                     container.innerHTML = commentsHTML;
                 }
             };
             
-            // --- Reports ---
             const fetchReportCategories = async () => {
                 const data = await apiFetch('/reports/categories');
                 const select = document.getElementById('report-category');
@@ -475,28 +480,34 @@
             };
             document.getElementById('create-report-form').addEventListener('submit', async e => {
                 e.preventDefault();
-                const report = {
-                    title: document.getElementById('report-title').value,
-                    category: document.getElementById('report-category').value,
-                    location: document.getElementById('report-location').value,
-                    description: document.getElementById('report-description').value,
-                };
-                 const data = await apiFetch('/reports', { method: 'POST', body: JSON.stringify(report) });
-                 if(data && data.success) {
+                let evidenceId = null;
+                const evidenceInput = document.getElementById('report-evidence-input');
+                if (evidenceInput.files.length > 0) {
+                    const formData = new FormData();
+                    formData.append('file', evidenceInput.files[0]);
+                    const uploadData = await apiFetch('/media/upload', { method: 'POST', body: formData });
+                    if (uploadData && uploadData.success) { evidenceId = uploadData.picture_id; } 
+                    else { return alert('Evidence upload failed. Report not created.'); }
+                }
+                const reportData = { title: document.getElementById('report-title').value, category: document.getElementById('report-category').value, location: document.getElementById('report-location').value, description: document.getElementById('report-description').value, evidence_id: evidenceId };
+                const data = await apiFetch('/reports', { method: 'POST', body: JSON.stringify(reportData) });
+                if(data && data.success) {
                     alert('Report created!');
                     e.target.reset();
                     document.getElementById('fetch-reports-btn').click();
-                 }
+                }
             });
             document.getElementById('fetch-reports-btn').addEventListener('click', async () => {
                 const data = await apiFetch('/reports');
                 const container = document.getElementById('reports-container');
                 if (data && data.success) {
-                    container.innerHTML = data.reports.length ? data.reports.map(r => `<div class="bg-white p-4 rounded-lg shadow"><h4 class="font-bold text-lg">${r.title || 'Untitled Report'}</h4><p class="text-sm bg-indigo-100 text-indigo-700 inline-block px-2 py-0.5 rounded-full my-1">${r.category}</p><p class="text-gray-600 mt-1 font-semibold">${r.location}</p><p class="my-2">${r.description}</p><div class="text-xs text-gray-500">By ${r.user.name} on ${new Date(r.created_at).toLocaleDateString()}</div><div class="flex items-center gap-4 mt-2"><button class="like-report-btn" data-report-id="${r.report_id}">👍 <span id="report-likes-${r.report_id}">${r.likes_count}</span></button><button class="verify-report-btn" data-report-id="${r.report_id}">✅ <span id="report-verifs-${r.report_id}">${r.verification_count}</span></button></div></div>`).join('') : '<p>No reports found.</p>';
+                    container.innerHTML = data.reports.length ? data.reports.map(r => {
+                        const evidenceHTML = r.evidence_id ? `<img src="${API_BASE_URL}/media/view/${r.evidence_id}" class="mt-3 rounded-lg w-full object-cover max-h-96">` : '';
+                        return `<div class="bg-white p-4 rounded-lg shadow"><h4 class="font-bold text-lg">${r.title || 'Untitled Report'}</h4><p class="text-sm bg-indigo-100 text-indigo-700 inline-block px-2 py-0.5 rounded-full my-1">${r.category}</p><p class="text-gray-600 mt-1 font-semibold">${r.location}</p><p class="my-2">${r.description}</p>${evidenceHTML}<div class="text-xs text-gray-500">By ${r.user.name} on ${new Date(r.created_at).toLocaleDateString()}</div><div class="flex items-center gap-4 mt-2"><button class="like-report-btn" data-report-id="${r.report_id}">👍 <span id="report-likes-${r.report_id}">${r.likes_count}</span></button><button class="verify-report-btn" data-report-id="${r.report_id}">✅ <span id="report-verifs-${r.report_id}">${r.verification_count}</span></button></div></div>`
+                    }).join('') : '<p>No reports found.</p>';
                 }
             });
 
-            // --- Bills ---
             const fetchBillTypes = async () => {
                 const data = await apiFetch('/bills/types');
                 const select = document.getElementById('bill-type');
@@ -531,7 +542,6 @@
                 }
             });
 
-            // --- Rewards ---
             document.getElementById('fetch-rewards-btn').addEventListener('click', async () => {
                 const data = await apiFetch('/rewards');
                 const container = document.getElementById('rewards-container');
@@ -540,7 +550,6 @@
                 }
             });
 
-            // --- Leaderboard ---
             const fetchLeaderboard = async (type) => {
                 if (type === 'friends' && !currentUser) return alert('You must be logged in.');
                 const endpoint = type === 'global' ? '/leaderboard/global' : `/leaderboard/friends/${currentUser.user_id}`;
@@ -553,7 +562,6 @@
             document.getElementById('fetch-global-leaderboard-btn').addEventListener('click', () => fetchLeaderboard('global'));
             document.getElementById('fetch-friends-leaderboard-btn').addEventListener('click', () => fetchLeaderboard('friends'));
             
-            // --- Notifications ---
             document.getElementById('fetch-notifications-btn').addEventListener('click', async () => {
                 if (!currentUser) return;
                 const data = await apiFetch(`/notifications/${currentUser.user_id}`);
@@ -563,7 +571,6 @@
                 }
             });
             
-            // --- Admin ---
             document.getElementById('create-reward-form').addEventListener('submit', async e => {
                  e.preventDefault();
                  const reward = { title: document.getElementById('reward-title').value, description: document.getElementById('reward-description').value, points_required: parseInt(document.getElementById('reward-points').value), badge_name: document.getElementById('reward-badge').value, task_type: document.getElementById('reward-task-type').value, task_count: parseInt(document.getElementById('reward-task-count').value) };
@@ -573,6 +580,7 @@
                     e.target.reset();
                  }
             });
+
             document.getElementById('fetch-admin-stats-btn').addEventListener('click', async() => {
                 const data = await apiFetch('/admin/stats');
                 const container = document.getElementById('admin-stats-container');
@@ -581,7 +589,6 @@
                 }
             });
             
-            // --- CONSOLIDATED EVENT LISTENERS ---
             document.addEventListener('submit', async e => {
                 if (e.target.classList.contains('add-comment-form')) {
                     e.preventDefault();
@@ -598,6 +605,7 @@
                     }
                 }
             });
+            
             document.addEventListener('click', async e => {
                 const target = e.target;
                 const likeBtn = target.closest('.like-post-btn');
@@ -617,7 +625,7 @@
                     const postId = commentBtn.dataset.postId;
                     const commentsSection = document.getElementById(`comments-section-${postId}`);
                     const isNowHidden = commentsSection.classList.toggle('hidden');
-                    if (!isNowHidden && !commentsSection.hasChildNodes()) { // Only fetch if opening and empty
+                    if (!isNowHidden && !commentsSection.hasChildNodes()) {
                         fetchComments(postId);
                     }
                 } else if (deleteBtn) {
@@ -650,7 +658,6 @@
                 }
             });
 
-            // --- Initial Load ---
             const init = () => {
                 updateLoginStatus();
                 showSection(window.location.hash || '#auth');
